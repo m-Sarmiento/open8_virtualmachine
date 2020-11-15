@@ -1,0 +1,9 @@
+[build-system]
+requires = ["flit"]
+build-backend = "flit.buildapi"
+
+[tool.flit.metadata]
+module = "lc3vm"
+author = "Paul Nameless"
+author-email = "paul.nameless@icloud.com"
+home-page = "https://github.com/paul-nameless"
