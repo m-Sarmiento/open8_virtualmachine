@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """
-Implementation of virtual machine for LC-3 assembly language in python
+Implementation of virtual machine for open8 assembly language in python
 """
 
-__version__ = '1.1'
+__version__ = '1.0'
 
 import array
 import select
@@ -13,7 +13,7 @@ import tty
 
 
 UINT16_MAX = 2 ** 16
-PC_START = 0x3000
+PC_START = 0x0000
 
 is_running = 1
 memory = None
@@ -32,20 +32,27 @@ def getchar():
         exit(130)
     return ch
 
+def set_bit(value, bit):
+    return value | (1<<bit)
+
+def clear_bit(value, bit):
+    return value & ~(1<<bit)
 
 class R:
     """Regisers"""
-    R0 = 0
-    R1 = 1
-    R2 = 2
-    R3 = 3
-    R4 = 4
-    R5 = 5
-    R6 = 6
-    R7 = 7
-    PC = 8  # program counter
-    COND = 9
-    COUNT = 10
+    R0          = 0
+    R1          = 1
+    R2          = 2
+    R3          = 3
+    R4          = 4
+    R5          = 5
+    R6          = 6
+    R7          = 7
+    PSR         = 8  # program status register
+    STACK       = 9  # stack pointer register
+    PC          = 10 # PROGRAM_COUNTER pointer to the currently executing instruction
+    VECTOR_BASE = 11 # The implementation specific location of the interrupt vectors
+    INTERRUPT_MASK_REGISTER = 12
 
 
 class register_dict(dict):
@@ -54,35 +61,50 @@ class register_dict(dict):
         super().__setitem__(key, value % UINT16_MAX)
 
 
-reg = register_dict({i: 0 for i in range(R.COUNT)})
+reg = register_dict({i: 0 for i in range(R.INTERRUPT_MASK_REGISTER)})
 
 
 class OP:
     """opcode"""
-    BR = 0  # branch
-    ADD = 1  # add
-    LD = 2  # load
-    ST = 3  # store
-    JSR = 4  # jump register
-    AND = 5  # bitwise and
-    LDR = 6  # load register
-    STR = 7  # store register
-    RTI = 8  # unused
-    NOT = 9  # bitwise not
-    LDI = 10  # load indirect
-    STI = 11  # store indirect
-    RET = 12  # jump
-    JMP = 12  # jump
-    RES = 13  # reserved (unused)
-    LEA = 14  # load effective address
-    TRAP = 15  # execute trap
-
+    INC = 0
+    ADC = 1
+    TX0 = 2
+    OR  = 3
+    AND = 4
+    XOR = 5
+    ROL = 6
+    ROR = 7
+    DEC = 8
+    SBC = 9
+    ADD = 10
+    STP = 11
+    BTT = 12
+    CLP = 13
+    T0X = 14
+    CMP = 15
+    PSH = 16
+    POP = 17
+    BR0 = 18
+    BR1 = 19
+    DBNZ= 20
+    INT = 21
+    MUL = 22
+    SPECIAL = 23
+    UPP = 24
+    STA = 25
+    STX = 26
+    STO = 27
+    LDI = 28
+    LDA = 29
+    LDO = 30
+    LDX = 31
 
 class FL:
     """flags"""
-    POS = 1 << 0  # P
-    ZRO = 1 << 1  # Z
-    NEG = 1 << 2  # N
+    ZRO = 1 << 0  # Zero flag
+    CRY = 1 << 1  # Carry flag
+    NEG = 1 << 2  # Negative flag
+    INT = 1 << 3  # Interrupt enable
 
 
 """
@@ -94,122 +116,321 @@ def bad_opcode(op):
     raise Exception(f'Bad opcode: {op}')
 
 
-def add(instr):
-    # destination register (DR)
-    r0 = (instr >> 9) & 0x7
-    # first operand (SR1)
-    r1 = (instr >> 6) & 0x7
-    # whether we are in immediate mode
-    imm_flag = (instr >> 5) & 0x1
+def inc(instr):
+    # destination register
+    rn = (instr) & 0x7
+    reg[rn] = reg[rn] + 1
+    update_flags_012(rn)
+    reg[rn] &= 0xFF
 
-    if imm_flag:
-        imm5 = sign_extend(instr & 0x1F, 5)
-        reg[r0] = reg[r1] + imm5
-    else:
-        r2 = instr & 0x7
-        reg[r0] = reg[r1] + reg[r2]
+def adc(instr):
+    # destination register
+    rn = (instr) & 0x7
+    reg[0] = reg[0] + reg[rn] + ((reg[R.PSR] >> 1) & 0x1)
+    update_flags_012(0)
+    reg[0] &= 0xFF
 
-    update_flags(r0)
+def tx0(instr):
+    # destination register
+    rn = (instr) & 0x7
+    reg[0] = reg[rn] 
+    update_flags_02(0)
+    reg[0] &= 0xFF
 
-
-def ldi(instr):
-    """Load indirect"""
-    # destination register (DR)
-    r0 = (instr >> 9) & 0x7
-    # PCoffset 9
-    pc_offset = sign_extend(instr & 0x1ff, 9)
-    # add pc_offset to the current PC, look at that memory location to get
-    # the final address
-    reg[r0] = mem_read(mem_read(reg[R.PC] + pc_offset))
-    update_flags(r0)
-
+def or_(instr):
+    # destination register
+    rn = (instr) & 0x7
+    reg[0] = reg[rn] | reg[0]
+    update_flags_02(0)
+    reg[0] &= 0xFF
 
 def and_(instr):
-    r0 = (instr >> 9) & 0x7
-    r1 = (instr >> 6) & 0x7
-    r2 = instr & 0x7
-    imm_flag = (instr >> 5) & 0x1
+    # destination register
+    rn = (instr) & 0x7
+    reg[0] = reg[rn] & reg[0]
+    update_flags_02(0)
+    reg[0] &= 0xFF
 
-    if imm_flag:
-        imm5 = sign_extend(instr & 0x1F, 5)
-        reg[r0] = reg[r1] & imm5
+def xor(instr):
+    # destination register
+    rn = (instr) & 0x7
+    reg[0] = reg[rn] ^ reg[0]
+    update_flags_02(0)
+    reg[0] &= 0xFF
+
+def rol(instr):
+    # destination register
+    rn = (instr) & 0x7
+    tmp = (reg[rn] >> 7) & 0x1
+    reg[rn] = (reg[rn] <<  1) | ((reg[R.PSR] >> 1) & 0x1)
+    update_flags_02(rn)
+    if (tmp):
+        reg[R.PSR] |=  FL.CRY
     else:
-        reg[r0] = reg[r1] & reg[r2]
-
-    update_flags(r0)
-
-
-def not_(instr):
-    r0 = (instr >> 9) & 0x7
-    r1 = (instr >> 6) & 0x7
-    reg[r0] = ~reg[r1]
-    update_flags(r0)
+        reg[R.PSR] &= ~FL.CRY
+    reg[rn] &= 0xFF
 
 
-def br(instr):
-    pc_offset = sign_extend((instr) & 0x1ff, 9)
-    cond_flag = (instr >> 9) & 0x7
-    if cond_flag & reg[R.COND]:
+def ror(instr):
+    # destination register
+    rn = (instr) & 0x7
+    tmp = reg[rn] & 0x1
+    reg[rn] = (reg[rn] >>  1) | ((reg[PSR] << 7) & 0xFF) 
+    update_flags_02(0)
+    if (tmp):
+        reg[R.PSR] |=  FL.CRY
+    else:
+        reg[R.PSR] &= ~FL.CRY
+    reg[rn] &= 0xFF
+
+def dec(instr):
+    # destination register
+    rn = (instr) & 0x7
+    reg[rn] = reg[rn] + 0xFF
+    update_flags_012(rn)
+    reg[rn] &= 0xFF
+
+def sbc(instr):
+    # destination register
+    rn = (instr) & 0x7
+    reg[0] = reg[0] + (-reg[rn]) + ((reg[PSR] >> 1) & 0x1) 
+    update_flags_012(0)
+    reg[0] &= 0xFF
+
+def add(instr):
+    # destination register
+    rn = (instr) & 0x7
+    reg[0] = reg[0] + reg[rn]
+    update_flags_012(0)
+    reg[0] &= 0xFF
+
+def stp(instr):
+    # destination register
+    n = (instr) & 0x7
+    reg[PSR] = reg[PSR] | ( 1 << n )
+
+def btt(instr):
+    # destination register
+    n = (instr) & 0x7
+    if ~((reg[0] >> n) & 0x1):
+        reg[R.PSR] |=  FL.ZRO
+    else:
+        reg[R.PSR] &= ~FL.ZRO
+    if (reg[0] >> 7)  & 0x1:
+        reg[R.PSR] |=  FL.NEG
+    else:
+        reg[R.PSR] &= ~FL.NEG
+
+def clp(instr):
+    # destination register
+    n = (instr) & 0x7
+    reg[PSR] = reg[PSR] & ~( 1 << n )
+
+def t0x(instr):
+    # destination register
+    rn = (instr) & 0x7
+    reg[rn] = reg[0] 
+    update_flags_02(rn)
+    reg[0] &= 0xFF
+
+def cmp_(instr):
+    # destination register
+    rn = (instr) & 0x7
+    tmp= reg[0] + (-reg[rn])
+    if tmp == 0:
+        reg[R.PSR] |=  FL.ZRO
+    else:
+        reg[R.PSR] &= ~FL.ZRO
+    if (tmp >> 8)  & 0x1:
+        reg[R.PSR] |=  FL.CRY
+    else:
+        reg[R.PSR] &= ~FL.CRY
+    if (tmp >> 7)  & 0x1:
+        reg[R.PSR] |=  FL.NEG
+    else:
+        reg[R.PSR] &= ~FL.NEG
+
+def psh(instr):
+    rn = (instr) & 0x7
+    mem_write(reg[STACK], reg[rn])
+    reg[STACK] = reg[R.STACK] - 1
+
+def pop(instr):
+    rn = (instr) & 0x7
+    reg[rn] = mem_read(reg[R.STACK])
+    reg[R.STACK] = reg[R.STACK] + 1
+
+def br0(instr):
+    bit = (instr) & 0x7
+    pc_offset = sign_extend((mem_read(reg[R.PC])) & 0xff, 8)
+    if ((reg[R.COND]>>bit) & 0x1) == 0:
         reg[R.PC] += pc_offset
 
+def br1(instr):
+    bit = (instr) & 0x7
+    pc_offset = sign_extend((mem_read(reg[R.PC])) & 0xff, 8)
+    if ((reg[R.COND]>>bit) & 0x1) == 1:
+        reg[R.PC] += pc_offset
 
-def jmp(instr):
-    r1 = (instr >> 6) & 0x7
-    reg[R.PC] = reg[r1]
+def dbnz(instr):
+    rn = (instr) & 0x7
+    reg[rn] = reg[rn] + 0xFF
+    update_flags_012(rn)
+    reg[rn] &= 0xFF 
+    pc_offset = sign_extend((mem_read(reg[R.PC])) & 0xff, 8)
+    if ((reg[R.COND]>>bit) & 0x1) == 1:
+        reg[R.PC] += pc_offset
 
+def int_(instr):
+    n = (instr) & 0x7
+    if (n==0)|(((reg[R.PSR]>>3) & 0x1) == 1) & (((reg[R.INTERRUPT_MASK_REGISTER]>>n) & 0x1 )==1):
+        mem_write(reg[R.STACK],reg[R.PSR])
+        reg[R.STACK] -= 1
+        mem_write(reg[R.STACK],(reg[R.PC]>>8)&0xFF)
+        reg[R.STACK] -= 1
+        mem_write(reg[R.STACK],reg[R.PC]&0xFF)
+        reg[R.STACK] -= 1
+        hi8 = mem_read(reg[R.VECTOR_BASE]+(n*2)+1)
+        lo8 = mem_read(reg[R.VECTOR_BASE]+(n*2))
+        reg[R.PC] = (hi8 << 8) | lo8
 
-def jsr(instr):
-    r1 = (instr >> 6) & 0x7
-    long_pc_offset = sign_extend(instr & 0x7ff, 11)
-    long_flag = (instr >> 11) & 1
-    reg[R.R7] = reg[R.PC]
-
-    if long_flag:
-        reg[R.PC] += long_pc_offset  # JSR
+def mul(instr):
+    rn = (instr) & 0x7
+    tmp = reg[rn] * reg[0]
+    reg[R.R1] = (tmp >> 8 ) & 0xFF
+    reg[R.R0] = (tmp ) & 0xFF
+    if tmp == 0:
+        reg[R.PSR] |=  FL.ZRO
     else:
-        reg[R.PC] = reg[r1]
+        reg[R.PSR] &= ~FL.ZRO
 
+def special (instr):
+    select = (instr) & 0x7
+    if select == 0:
+                    if (Allow_Stack_Address_Move):
+                        reg[R.STACK] = reg[1] << 8 | reg[0]
+                    else:
+                        reg[R.STACK] = 0x007F
+            #RTS
+    elif select == 1:  
+                    reg[R.PC] = (mem_read(reg[R.STACK]+1) << 8) | mem_read(reg[R.STACK])
+                    reg[R.STACK] += 2
+            #RTI
+    elif select == 2: 
+                    reg[R.PC] = (mem_read(reg[R.STACK]+1) << 8) | mem_read(reg[R.STACK])
+                    reg[R.PSR] = mem_read(reg[R.STACK]+2)
+                    reg[R.STACK] += 3
+            #BRK
+    elif select == 3: 
+                    pass
+            #JMP
+    elif select == 4: 
+                    hi8 = mem_read(reg[R.PC])
+                    lo8 = mem_read(reg[R.PC]+1)
+                    reg[R.PC] = (hi8 << 8) | lo8
+            #SMSK
+    elif select == 5: 
+                    pass
+            #GMSK
+    elif select == 6: 
+                    pass
+            #JSR
+    elif select == 7: 
+                    tmp = reg[R.PC]+2
+                    hi8 = mem_read(reg[R.PC])
+                    lo8 = mem_read(reg[R.PC]+1)
+                    mem_write(reg[R.STACK],(tmp >> 8) & 0xFF)
+                    reg[R.STACK] -= 1
+                    mem_write(reg[R.STACK],(tmp >> 8) & 0xFF)
+                    reg[R.STACK] -= 1
+                    reg[R.PC] = (hi8 << 8) | lo8
+    else: 
+                    pass
 
-def ld(instr):
-    r0 = (instr >> 9) & 0x7
-    pc_offset = sign_extend(instr & 0x1ff, 9)
-    reg[r0] = mem_read(reg[R.PC] + pc_offset)
-    update_flags(r0)
+def upp(instr):
+    rn = (instr) & 0x7
+    tmp =(( reg[rn+1]<<8 ) | reg[rn]) + 1
+    reg[rn+1] = (tmp >> 8) & 0xFF 
+    reg[rn]   = (tmp >> 0) & 0xFF 
+    if (tmp >> 16)  & 0x1:
+        reg[R.PSR] |=  FL.CRY
+    else:
+        reg[R.PSR] &= ~FL.CRY
 
+def sta(instr):
+    rn = (instr) & 0x7
+    hi8 = mem_read(reg(R.PC))
+    lo8 = mem_read(reg(R.PC)+1)
+    addr = (hi8<<8) | lo8
+    mem_write(addr,reg[rn])
+    reg[R.PC] += 2
 
-def ldr(instr):
-    r0 = (instr >> 9) & 0x7
-    r1 = (instr >> 6) & 0x7
-    offset = sign_extend(instr & 0x3F, 6)
-    reg[r0] = mem_read(reg[r1] + offset)
-    update_flags(r0)
+def stx(instr):
+    rn = (instr) & 0x6
+    a = (instr) & 0x1
+    hi8 = reg[rn+1]
+    lo8 = reg[rn]
+    addr = (hi8<<8) | lo8
+    mem_write(addr,reg[R.R0])
+    addr += a
+    reg[rn+1] = (addr >> 8) & 0xFF
+    reg[rn] = addr & 0xFF
 
+def sto(instr):
+    rn = (instr) & 0x6
+    a = (instr) & 0x1
+    offset = reg[R.PC]
+    hi8 = reg[rn+1]
+    lo8 = reg[rn]
+    addr = (hi8<<8) | lo8
+    mem_write(addr+offset,reg[R.R0])
+    addr += a
+    reg[rn+1] = (addr >> 8) & 0xFF
+    reg[rn] = addr & 0xFF
+    reg[R.PC] += 1
 
-def lea(instr):
-    r0 = (instr >> 9) & 0x7
-    pc_offset = sign_extend(instr & 0x1ff, 9)
-    reg[r0] = reg[R.PC] + pc_offset
-    update_flags(r0)
+def ldi(instr):
+    rn = (instr) & 0x7
+    imm = reg[R.PC]
+    reg[rn] = imm
+    update_flags_02(rn)
+    reg[R.PC] += 1
 
+def lda(instr):
+    rn = (instr) & 0x7
+    hi8 = mem_read(reg(R.PC))
+    lo8 = mem_read(reg(R.PC)+1)
+    addr = (hi8<<8) | lo8
+    reg[rn] = mem_read(addr)
+    update_flags_02(rn)
+    reg[R.PC] += 2
 
-def st(instr):
-    r0 = (instr >> 9) & 0x7
-    pc_offset = sign_extend(instr & 0x1ff, 9)
-    mem_write(reg[R.PC] + pc_offset, reg[r0])
+def ldx(instr):
+    rn = (instr) & 0x6
+    a = (instr) & 0x1
+    hi8 = reg[rn+1]
+    lo8 = reg[rn]
+    addr = (hi8<<8) | lo8
+    reg[R.R0] = mem_read(addr) 
+    update_flags_02(R.R0)
+    mem_write(addr,reg[R.R0])
+    addr += a
+    reg[rn+1] = (addr >> 8) & 0xFF
+    reg[rn] = addr & 0xFF
 
-
-def sti(instr):
-    r0 = (instr >> 9) & 0x7
-    pc_offset = sign_extend(instr & 0x1ff, 9)
-    mem_write(mem_read(reg[R.PC] + pc_offset), reg[r0])
-
-
-def str_(instr):
-    r0 = (instr >> 9) & 0x7
-    r1 = (instr >> 6) & 0x7
-    offset = sign_extend(instr & 0x3F, 6)
-    mem_write(reg[r1] + offset, reg[r0])
-
+def ldo(instr):
+    rn = (instr) & 0x6
+    a = (instr) & 0x1
+    offset = reg[R.PC]
+    hi8 = reg[rn+1]
+    lo8 = reg[rn]
+    addr = (hi8<<8) | lo8
+    reg[R.R0] = mem_read(addr+offset)
+    update_flags_02(R.R0)
+    addr += a
+    reg[rn+1] = (addr >> 8) & 0xFF
+    reg[rn] = addr & 0xFF
+    reg[R.PC] += 1
 
 """
 TRAPs implementation
@@ -292,21 +513,38 @@ traps = {
 
 
 ops = {
-    OP.ADD: add,
-    OP.NOT: not_,
+    OP.INC: inc,
+    OP.ADC: adc,
+    OP.TX0: tx0,
+    OP.OR : or_ ,
     OP.AND: and_,
-    OP.BR: br,
-    OP.JMP: jmp,
-    OP.RET: jmp,
-    OP.JSR: jsr,
-    OP.LD: ld,
+    OP.XOR: xor,
+    OP.ROL: rol,
+    OP.ROR: ror,
+    OP.DEC: dec,
+    OP.SBC: sbc,
+    OP.ADD: add,
+    OP.STP: stp,
+    OP.BTT: btt,
+    OP.CLP: clp,
+    OP.T0X: t0x,
+    OP.CMP: cmp_,
+    OP.PSH: psh,
+    OP.POP: pop,
+    OP.BR0: br0,
+    OP.BR1: br1,
+    OP.DBNZ: dbnz,
+    OP.INT: int_,
+    OP.MUL: mul,
+    OP.SPECIAL:special,
+    OP.UPP: upp,
+    OP.STA: sta,
+    OP.STX: stx,
+    OP.STO: sto,
     OP.LDI: ldi,
-    OP.LDR: ldr,
-    OP.LEA: lea,
-    OP.ST: st,
-    OP.STI: sti,
-    OP.STR: str_,
-    OP.TRAP: trap,
+    OP.LDA: lda,
+    OP.LDO: ldo,
+    OP.LDX: ldx
 }
 
 
@@ -345,21 +583,37 @@ def sign_extend(x, bit_count):
     return x & 0xffff
 
 
-def update_flags(r):
-    if not reg.get(r):
-        reg[R.COND] = FL.ZRO
-    elif reg[r] >> 15:
-        reg[R.COND] = FL.NEG
+def update_flags_012(r):
+    if reg[r] == 0:
+        reg[R.PSR] |=  FL.ZRO
     else:
-        reg[R.COND] = FL.POS
+        reg[R.PSR] &= ~FL.ZRO
+    if (reg[r] >> 8)  & 0x1:
+        reg[R.PSR] |=  FL.CRY
+    else:
+        reg[R.PSR] &= ~FL.CRY
+    if (reg[r] >> 7)  & 0x1:
+        reg[R.PSR] |=  FL.NEG
+    else:
+        reg[R.PSR] &= ~FL.NEG
+
+def update_flags_02(r):
+    if reg[r] == 0:
+        reg[R.PSR] |=  FL.ZRO
+    else:
+        reg[R.PSR] &= ~FL.ZRO
+    if (reg[r] >> 7)  & 0x1:
+        reg[R.PSR] |=  FL.NEG
+    else:
+        reg[R.PSR] &= ~FL.NEG
 
 
 def read_image_file(file_name):
     global memory
 
     with open(file_name, 'rb') as f:
-        origin = int.from_bytes(f.read(2), byteorder='big')
-        memory = array.array("H", [0] * origin)
+        origin = int.from_bytes(f.read(1), byteorder='big')
+        memory = array.array("B", [0] * origin)
         max_read = UINT16_MAX - origin
         memory.frombytes(f.read(max_read))
         memory.byteswap()
@@ -367,6 +621,7 @@ def read_image_file(file_name):
 
 
 def main():
+    Allow_Stack_Address_Move = 0
     if len(sys.argv) < 2:
         print('vm.py [obj-file]')
         exit(2)
@@ -379,7 +634,7 @@ def main():
     while is_running:
         instr = mem_read(reg[R.PC])
         reg[R.PC] += 1
-        op = instr >> 12
+        op = instr >> 3
         fun = ops.get(op, bad_opcode)
         fun(instr)
 
