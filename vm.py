@@ -10,9 +10,10 @@ import select
 import sys
 import termios
 import tty
+import time
 
 
-UINT16_MAX = 2 ** 16
+UINT16_MAX = 2 ** 8
 PC_START = 0x0000
 
 is_running = 1
@@ -175,7 +176,7 @@ def ror(instr):
     # destination register
     rn = (instr) & 0x7
     tmp = reg[rn] & 0x1
-    reg[rn] = (reg[rn] >>  1) | ((reg[PSR] << 7) & 0xFF) 
+    reg[rn] = (reg[rn] >>  1) | ((reg[R.PSR] << 7) & 0xFF) 
     update_flags_02(0)
     if (tmp):
         reg[R.PSR] |=  FL.CRY
@@ -193,7 +194,7 @@ def dec(instr):
 def sbc(instr):
     # destination register
     rn = (instr) & 0x7
-    reg[0] = reg[0] + (-reg[rn]) + ((reg[PSR] >> 1) & 0x1) 
+    reg[0] = reg[0] + (-reg[rn]) + ((reg[R.PSR] >> 1) & 0x1) 
     update_flags_012(0)
     reg[0] &= 0xFF
 
@@ -207,7 +208,7 @@ def add(instr):
 def stp(instr):
     # destination register
     n = (instr) & 0x7
-    reg[PSR] = reg[PSR] | ( 1 << n )
+    reg[R.PSR] = reg[R.PSR] | ( 1 << n )
 
 def btt(instr):
     # destination register
@@ -224,7 +225,7 @@ def btt(instr):
 def clp(instr):
     # destination register
     n = (instr) & 0x7
-    reg[PSR] = reg[PSR] & ~( 1 << n )
+    reg[R.PSR] = reg[R.PSR] & ~( 1 << n )
 
 def t0x(instr):
     # destination register
@@ -252,8 +253,8 @@ def cmp_(instr):
 
 def psh(instr):
     rn = (instr) & 0x7
-    mem_write(reg[STACK], reg[rn])
-    reg[STACK] = reg[R.STACK] - 1
+    mem_write(reg[R.STACK], reg[rn])
+    reg[R.STACK] = reg[R.STACK] - 1
 
 def pop(instr):
     rn = (instr) & 0x7
@@ -263,13 +264,13 @@ def pop(instr):
 def br0(instr):
     bit = (instr) & 0x7
     pc_offset = sign_extend((mem_read(reg[R.PC])) & 0xff, 8)
-    if ((reg[R.COND]>>bit) & 0x1) == 0:
+    if ((reg[R.PSR]>>bit) & 0x1) == 0:
         reg[R.PC] += pc_offset
 
 def br1(instr):
     bit = (instr) & 0x7
     pc_offset = sign_extend((mem_read(reg[R.PC])) & 0xff, 8)
-    if ((reg[R.COND]>>bit) & 0x1) == 1:
+    if ((reg[R.PSR]>>bit) & 0x1) == 1:
         reg[R.PC] += pc_offset
 
 def dbnz(instr):
@@ -278,21 +279,22 @@ def dbnz(instr):
     update_flags_012(rn)
     reg[rn] &= 0xFF 
     pc_offset = sign_extend((mem_read(reg[R.PC])) & 0xff, 8)
-    if ((reg[R.COND]>>bit) & 0x1) == 1:
+    if ((reg[R.PSR]) & 0x1) == 1:
         reg[R.PC] += pc_offset
 
 def int_(instr):
     n = (instr) & 0x7
-    if (n==0)|(((reg[R.PSR]>>3) & 0x1) == 1) & (((reg[R.INTERRUPT_MASK_REGISTER]>>n) & 0x1 )==1):
-        mem_write(reg[R.STACK],reg[R.PSR])
-        reg[R.STACK] -= 1
-        mem_write(reg[R.STACK],(reg[R.PC]>>8)&0xFF)
-        reg[R.STACK] -= 1
-        mem_write(reg[R.STACK],reg[R.PC]&0xFF)
-        reg[R.STACK] -= 1
-        hi8 = mem_read(reg[R.VECTOR_BASE]+(n*2)+1)
-        lo8 = mem_read(reg[R.VECTOR_BASE]+(n*2))
-        reg[R.PC] = (hi8 << 8) | lo8
+    pass
+    #if (n == 0) | ((((reg[R.PSR]>>3) & 0x1) == 1) & (((reg[R.INTERRUPT_MASK_REGISTER]>>n) & 0x1 )==1)):
+    #    mem_write(reg[R.STACK],reg[R.PSR])
+    #    reg[R.STACK] -= 1
+    #    mem_write(reg[R.STACK],(reg[R.PC]>>8)&0xFF)
+    #    reg[R.STACK] -= 1
+    #    mem_write(reg[R.STACK],reg[R.PC]&0xFF)
+    #    reg[R.STACK] -= 1
+    #    hi8 = mem_read(reg[R.VECTOR_BASE]+(n*2)+1)
+    #    lo8 = mem_read(reg[R.VECTOR_BASE]+(n*2))
+    #    reg[R.PC] = (hi8 << 8) | lo8
 
 def mul(instr):
     rn = (instr) & 0x7
@@ -359,8 +361,8 @@ def upp(instr):
 
 def sta(instr):
     rn = (instr) & 0x7
-    hi8 = mem_read(reg(R.PC))
-    lo8 = mem_read(reg(R.PC)+1)
+    hi8 = mem_read(reg[R.PC])
+    lo8 = mem_read(reg[R.PC]+1)
     addr = (hi8<<8) | lo8
     mem_write(addr,reg[rn])
     reg[R.PC] += 2
@@ -398,8 +400,8 @@ def ldi(instr):
 
 def lda(instr):
     rn = (instr) & 0x7
-    hi8 = mem_read(reg(R.PC))
-    lo8 = mem_read(reg(R.PC)+1)
+    hi8 = mem_read(reg[R.PC])
+    lo8 = mem_read(reg[R.PC]+1)
     addr = (hi8<<8) | lo8
     reg[rn] = mem_read(addr)
     update_flags_02(rn)
@@ -570,8 +572,9 @@ def mem_read(address):
     address = address % UINT16_MAX
     if address == Mr.KBSR:
         if check_key():
-            memory[Mr.KBSR] = 1 << 15
-            memory[Mr.KBDR] = ord(getchar())
+            pass
+            #memory[Mr.KBSR] = 1 << 15
+            #memory[Mr.KBDR] = ord(getchar())
         else:
             memory[Mr.KBSR] = 0
     return memory[address]
@@ -610,14 +613,21 @@ def update_flags_02(r):
 
 def read_image_file(file_name):
     global memory
-
     with open(file_name, 'rb') as f:
-        origin = int.from_bytes(f.read(1), byteorder='big')
+        origin = 0 #int.from_bytes(f.read(1), byteorder='big')
         memory = array.array("B", [0] * origin)
         max_read = UINT16_MAX - origin
         memory.frombytes(f.read(max_read))
         memory.byteswap()
         memory.fromlist([0]*(UINT16_MAX - len(memory)))
+    #with open(file_name, 'rb') as f:
+    #    origin = int.from_bytes(f.read(1), byteorder='big')
+    #    memory = array.array("B", [0] * origin)
+    #    max_read = UINT16_MAX - origin
+    #    memory.frombytes(f.read(max_read))
+    #    memory.byteswap()
+    #    memory.fromlist([0]*(UINT16_MAX - len(memory)))
+        print(memory)
 
 
 def main():
@@ -637,6 +647,7 @@ def main():
         op = instr >> 3
         fun = ops.get(op, bad_opcode)
         fun(instr)
+
 
 
 if __name__ == '__main__':
