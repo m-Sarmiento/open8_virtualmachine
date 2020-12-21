@@ -11,6 +11,6 @@ No dependencies, just pure `python 3`.
 ## Running the VM
 
 ```
-./vm.py obj/main.obj
+./vm.py obj/main.bin
 # C-c to close
 ```

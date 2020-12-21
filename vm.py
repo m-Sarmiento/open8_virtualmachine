@@ -15,7 +15,7 @@ import time
 
 UINT16_MAX = 2 ** 8
 PC_START = 0x0000
-
+DEBUG = True
 is_running = 1
 memory = None
 
@@ -29,7 +29,7 @@ def getchar():
     finally:
         termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
     if ord(ch) == 3:
-        # handle keyboard interrupt
+        # h&le keyboard interrupt
         exit(130)
     return ch
 
@@ -122,42 +122,54 @@ def inc(instr):
     rn = (instr) & 0x7
     reg[rn] = reg[rn] + 1
     update_flags_012(rn)
-    reg[rn] &= 0xFF
+    reg[rn] = reg[rn] & 0xFF
+    if (DEBUG == True):
+        print( "inc " +"r"+str(rn)  )
 
 def adc(instr):
     # destination register
     rn = (instr) & 0x7
     reg[0] = reg[0] + reg[rn] + ((reg[R.PSR] >> 1) & 0x1)
     update_flags_012(0)
-    reg[0] &= 0xFF
+    reg[0] = reg[rn] & 0xFF
+    if (DEBUG == True):
+        print( "adc " +"r"+str(rn)  )
 
 def tx0(instr):
     # destination register
     rn = (instr) & 0x7
     reg[0] = reg[rn] 
     update_flags_02(0)
-    reg[0] &= 0xFF
+    reg[0] = reg[rn] & 0xFF
+    if (DEBUG == True):
+        print( "tx0 " +"r"+str(rn)  )
 
 def or_(instr):
     # destination register
     rn = (instr) & 0x7
     reg[0] = reg[rn] | reg[0]
     update_flags_02(0)
-    reg[0] &= 0xFF
+    reg[0] = reg[rn] & 0xFF
+    if (DEBUG == True):
+        print( "or  " +"r"+str(rn)  )
 
 def and_(instr):
     # destination register
     rn = (instr) & 0x7
     reg[0] = reg[rn] & reg[0]
     update_flags_02(0)
-    reg[0] &= 0xFF
+    reg[0] = reg[rn] & 0xFF
+    if (DEBUG == True):
+        print( "and " +"r"+str(rn)  )
 
 def xor(instr):
     # destination register
     rn = (instr) & 0x7
     reg[0] = reg[rn] ^ reg[0]
     update_flags_02(0)
-    reg[0] &= 0xFF
+    reg[0] = reg[rn] & 0xFF
+    if (DEBUG == True):
+        print( "xor " +"r"+str(rn)  )
 
 def rol(instr):
     # destination register
@@ -168,8 +180,11 @@ def rol(instr):
     if (tmp):
         reg[R.PSR] |=  FL.CRY
     else:
-        reg[R.PSR] &= ~FL.CRY
-    reg[rn] &= 0xFF
+        reg[R.PSR] = reg[R.PSR]  & ~FL.CRY
+    reg[rn] = reg[rn] &  0xFF
+    if (DEBUG == True):
+        print( "rol " +"r"+str(rn)  )
+
 
 
 def ror(instr):
@@ -181,34 +196,44 @@ def ror(instr):
     if (tmp):
         reg[R.PSR] |=  FL.CRY
     else:
-        reg[R.PSR] &= ~FL.CRY
-    reg[rn] &= 0xFF
+        reg[R.PSR] = reg[R.PSR] & ~FL.CRY
+    reg[rn] = reg[rn] &  0xFF
+    if (DEBUG == True):
+        print( "ror " +"r"+str(rn)  )
 
 def dec(instr):
     # destination register
     rn = (instr) & 0x7
     reg[rn] = reg[rn] + 0xFF
     update_flags_012(rn)
-    reg[rn] &= 0xFF
+    reg[rn] = reg[rn] &  0xFF
+    if (DEBUG == True):
+        print( "dec " +"r"+str(rn)  )
 
 def sbc(instr):
     # destination register
     rn = (instr) & 0x7
     reg[0] = reg[0] + (-reg[rn]) + ((reg[R.PSR] >> 1) & 0x1) 
     update_flags_012(0)
-    reg[0] &= 0xFF
+    reg[0] = reg[0] & 0xFF
+    if (DEBUG == True):
+        print( "sbc " +"r"+str(rn)  )
 
 def add(instr):
     # destination register
     rn = (instr) & 0x7
     reg[0] = reg[0] + reg[rn]
     update_flags_012(0)
-    reg[0] &= 0xFF
+    reg[0] = reg[0] & 0xFF
+    if (DEBUG == True):
+        print( "add " +"r"+str(rn)  )
 
 def stp(instr):
     # destination register
     n = (instr) & 0x7
     reg[R.PSR] = reg[R.PSR] | ( 1 << n )
+    if (DEBUG == True):
+        print( "dont yet")
 
 def btt(instr):
     # destination register
@@ -216,23 +241,29 @@ def btt(instr):
     if ~((reg[0] >> n) & 0x1):
         reg[R.PSR] |=  FL.ZRO
     else:
-        reg[R.PSR] &= ~FL.ZRO
+        reg[R.PSR] = reg[R.PSR] & ~FL.ZRO
     if (reg[0] >> 7)  & 0x1:
         reg[R.PSR] |=  FL.NEG
     else:
-        reg[R.PSR] &= ~FL.NEG
+        reg[R.PSR] = reg[R.PSR] & ~FL.NEG
+    if (DEBUG == True):
+        print( "dont yet")
 
 def clp(instr):
     # destination register
     n = (instr) & 0x7
     reg[R.PSR] = reg[R.PSR] & ~( 1 << n )
+    if (DEBUG == True):
+        print( "dont yet")
 
 def t0x(instr):
     # destination register
     rn = (instr) & 0x7
     reg[rn] = reg[0] 
     update_flags_02(rn)
-    reg[0] &= 0xFF
+    reg[0] = reg[R.PSR] & 0xFF
+    if (DEBUG == True):
+        print( "dont yet")
 
 def cmp_(instr):
     # destination register
@@ -241,49 +272,63 @@ def cmp_(instr):
     if tmp == 0:
         reg[R.PSR] |=  FL.ZRO
     else:
-        reg[R.PSR] &= ~FL.ZRO
+        reg[R.PSR] = reg[R.PSR] & ~FL.ZRO
     if (tmp >> 8)  & 0x1:
         reg[R.PSR] |=  FL.CRY
     else:
-        reg[R.PSR] &= ~FL.CRY
+        reg[R.PSR] = reg[R.PSR] & ~FL.CRY
     if (tmp >> 7)  & 0x1:
         reg[R.PSR] |=  FL.NEG
     else:
-        reg[R.PSR] &= ~FL.NEG
+        reg[R.PSR] = reg[R.PSR] & ~FL.NEG
+    if (DEBUG == True):
+        print( "dont yet")
 
 def psh(instr):
     rn = (instr) & 0x7
     mem_write(reg[R.STACK], reg[rn])
     reg[R.STACK] = reg[R.STACK] - 1
+    if (DEBUG == True):
+        print( "dont yet")
 
 def pop(instr):
     rn = (instr) & 0x7
     reg[rn] = mem_read(reg[R.STACK])
     reg[R.STACK] = reg[R.STACK] + 1
+    if (DEBUG == True):
+        print( "dont yet")
 
 def br0(instr):
     bit = (instr) & 0x7
     pc_offset = sign_extend((mem_read(reg[R.PC])) & 0xff, 8)
     if ((reg[R.PSR]>>bit) & 0x1) == 0:
         reg[R.PC] += pc_offset
+    if (DEBUG == True):
+        print( "dont yet")
 
 def br1(instr):
     bit = (instr) & 0x7
     pc_offset = sign_extend((mem_read(reg[R.PC])) & 0xff, 8)
     if ((reg[R.PSR]>>bit) & 0x1) == 1:
         reg[R.PC] += pc_offset
+    if (DEBUG == True):
+        print( "dont yet")
 
 def dbnz(instr):
     rn = (instr) & 0x7
     reg[rn] = reg[rn] + 0xFF
     update_flags_012(rn)
-    reg[rn] &= 0xFF 
+    reg[rn] = reg[rn] &  0xFF 
     pc_offset = sign_extend((mem_read(reg[R.PC])) & 0xff, 8)
     if ((reg[R.PSR]) & 0x1) == 1:
         reg[R.PC] += pc_offset
+    if (DEBUG == True):
+        print( "dont yet")
 
 def int_(instr):
     n = (instr) & 0x7
+    if (DEBUG == True):
+        print( "dont yet")
     pass
     #if (n == 0) | ((((reg[R.PSR]>>3) & 0x1) == 1) & (((reg[R.INTERRUPT_MASK_REGISTER]>>n) & 0x1 )==1)):
     #    mem_write(reg[R.STACK],reg[R.PSR])
@@ -304,7 +349,9 @@ def mul(instr):
     if tmp == 0:
         reg[R.PSR] |=  FL.ZRO
     else:
-        reg[R.PSR] &= ~FL.ZRO
+        reg[R.PSR] = reg[R.PSR] & ~FL.ZRO
+    if (DEBUG == True):
+        print( "dont yet")
 
 def special (instr):
     select = (instr) & 0x7
@@ -330,11 +377,17 @@ def special (instr):
                     hi8 = mem_read(reg[R.PC])
                     lo8 = mem_read(reg[R.PC]+1)
                     reg[R.PC] = (hi8 << 8) | lo8
+                    if (DEBUG == True):
+                        print( "dont yet")
             #SMSK
     elif select == 5: 
+                    if (DEBUG == True):
+                        print( "dont yet")
                     pass
             #GMSK
     elif select == 6: 
+                    if (DEBUG == True):
+                        print( "dont yet")
                     pass
             #JSR
     elif select == 7: 
@@ -346,6 +399,8 @@ def special (instr):
                     mem_write(reg[R.STACK],(tmp >> 8) & 0xFF)
                     reg[R.STACK] -= 1
                     reg[R.PC] = (hi8 << 8) | lo8
+                    if (DEBUG == True):
+                        print( "dont yet")
     else: 
                     pass
 
@@ -357,15 +412,19 @@ def upp(instr):
     if (tmp >> 16)  & 0x1:
         reg[R.PSR] |=  FL.CRY
     else:
-        reg[R.PSR] &= ~FL.CRY
+        reg[R.PSR] = reg[R.PSR] & ~FL.CRY
+    if (DEBUG == True):
+        print( "dont yet")
 
 def sta(instr):
     rn = (instr) & 0x7
-    hi8 = mem_read(reg[R.PC])
-    lo8 = mem_read(reg[R.PC]+1)
+    lo8 = mem_read(reg[R.PC])
+    hi8 = mem_read(reg[R.PC]+1)
     addr = (hi8<<8) | lo8
     mem_write(addr,reg[rn])
     reg[R.PC] += 2
+    if (DEBUG == True):
+        print( "sta " +"r"+str(rn)+" "+str(addr)  )
 
 def stx(instr):
     rn = (instr) & 0x6
@@ -377,6 +436,8 @@ def stx(instr):
     addr += a
     reg[rn+1] = (addr >> 8) & 0xFF
     reg[rn] = addr & 0xFF
+    if (DEBUG == True):
+        print( "dont yet")
 
 def sto(instr):
     rn = (instr) & 0x6
@@ -390,13 +451,17 @@ def sto(instr):
     reg[rn+1] = (addr >> 8) & 0xFF
     reg[rn] = addr & 0xFF
     reg[R.PC] += 1
+    if (DEBUG == True):
+        print( "dont yet")
 
 def ldi(instr):
     rn = (instr) & 0x7
-    imm = reg[R.PC]
+    imm = mem_read(reg[R.PC])
     reg[rn] = imm
     update_flags_02(rn)
     reg[R.PC] += 1
+    if (DEBUG == True):
+        print( "ldi " +"r"+str(rn)+" "+str(imm)  )
 
 def lda(instr):
     rn = (instr) & 0x7
@@ -406,6 +471,8 @@ def lda(instr):
     reg[rn] = mem_read(addr)
     update_flags_02(rn)
     reg[R.PC] += 2
+    if (DEBUG == True):
+        print( "dont yet")
 
 def ldx(instr):
     rn = (instr) & 0x6
@@ -419,6 +486,8 @@ def ldx(instr):
     addr += a
     reg[rn+1] = (addr >> 8) & 0xFF
     reg[rn] = addr & 0xFF
+    if (DEBUG == True):
+        print( "dont yet")
 
 def ldo(instr):
     rn = (instr) & 0x6
@@ -433,6 +502,8 @@ def ldo(instr):
     reg[rn+1] = (addr >> 8) & 0xFF
     reg[rn] = addr & 0xFF
     reg[R.PC] += 1
+    if (DEBUG == True):
+        print( "dont yet")
 
 """
 TRAPs implementation
@@ -551,9 +622,8 @@ ops = {
 
 
 class Mr:
-    KBSR = 0xFE00  # keyboard status
-    KBDR = 0xFE02  # keyboard data
-
+    KBSR = 0x2400  # keyboard status //uart
+    KBDR = 0x2402  # keyboard data   //
 
 def check_key():
     _, o, _ = select.select([], [sys.stdin], [], 0)
@@ -572,9 +642,8 @@ def mem_read(address):
     address = address % UINT16_MAX
     if address == Mr.KBSR:
         if check_key():
-            pass
-            #memory[Mr.KBSR] = 1 << 15
-            #memory[Mr.KBDR] = ord(getchar())
+            memory[Mr.KBSR] = 1 << 15
+            memory[Mr.KBDR] = ord(getchar())
         else:
             memory[Mr.KBSR] = 0
     return memory[address]
@@ -590,25 +659,25 @@ def update_flags_012(r):
     if reg[r] == 0:
         reg[R.PSR] |=  FL.ZRO
     else:
-        reg[R.PSR] &= ~FL.ZRO
+        reg[R.PSR] = reg[R.PSR] & ~FL.ZRO
     if (reg[r] >> 8)  & 0x1:
         reg[R.PSR] |=  FL.CRY
     else:
-        reg[R.PSR] &= ~FL.CRY
+        reg[R.PSR] = reg[R.PSR] & ~FL.CRY
     if (reg[r] >> 7)  & 0x1:
         reg[R.PSR] |=  FL.NEG
     else:
-        reg[R.PSR] &= ~FL.NEG
+        reg[R.PSR] = reg[R.PSR] & ~FL.NEG
 
 def update_flags_02(r):
     if reg[r] == 0:
         reg[R.PSR] |=  FL.ZRO
     else:
-        reg[R.PSR] &= ~FL.ZRO
+        reg[R.PSR] = reg[R.PSR] & ~FL.ZRO
     if (reg[r] >> 7)  & 0x1:
         reg[R.PSR] |=  FL.NEG
     else:
-        reg[R.PSR] &= ~FL.NEG
+        reg[R.PSR] = reg[R.PSR] & ~FL.NEG
 
 
 def read_image_file(file_name):
@@ -641,7 +710,8 @@ def main():
 
     reg[R.PC] = PC_START
 
-    while is_running:
+    #while is_running:
+    for i in range(15):
         instr = mem_read(reg[R.PC])
         reg[R.PC] += 1
         op = instr >> 3
