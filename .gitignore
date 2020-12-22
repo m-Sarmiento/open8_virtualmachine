@@ -1,0 +1,10 @@
+*.csv
+*.log
+*.dump
+*.ll
+*.elf
+*.ll
+*.mem
+*.o
+*.bc
+*.S

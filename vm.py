@@ -11,14 +11,16 @@ import sys
 import termios
 import tty
 import time
+import numpy
+import csv
 
 
-UINT16_MAX = 2 ** 8
-PC_START = 0x0000
-DEBUG = True
+UINT16_MAX = 2 ** 16
+
+DEBUG = False
+TERMINAL_OUT = True
 is_running = 1
 memory = None
-
 
 def getchar():
     fd = sys.stdin.fileno()
@@ -97,8 +99,8 @@ class OP:
     STO = 27
     LDI = 28
     LDA = 29
-    LDO = 30
-    LDX = 31
+    LDX = 30
+    LDO = 31
 
 class FL:
     """flags"""
@@ -129,45 +131,45 @@ def inc(instr):
 def adc(instr):
     # destination register
     rn = (instr) & 0x7
-    reg[0] = reg[0] + reg[rn] + ((reg[R.PSR] >> 1) & 0x1)
-    update_flags_012(0)
-    reg[0] = reg[rn] & 0xFF
+    reg[R.R0] = reg[R.R0] + reg[rn] + ((reg[R.PSR] >> 1) & 0x1)
+    update_flags_012(R.R0)
+    reg[R.R0] = reg[rn] & 0xFF
     if (DEBUG == True):
         print( "adc " +"r"+str(rn)  )
 
 def tx0(instr):
     # destination register
     rn = (instr) & 0x7
-    reg[0] = reg[rn] 
-    update_flags_02(0)
-    reg[0] = reg[rn] & 0xFF
+    reg[R.R0] = reg[rn] 
+    update_flags_02(R.R0)
+    reg[R.R0] = reg[rn] & 0xFF
     if (DEBUG == True):
         print( "tx0 " +"r"+str(rn)  )
 
 def or_(instr):
     # destination register
     rn = (instr) & 0x7
-    reg[0] = reg[rn] | reg[0]
-    update_flags_02(0)
-    reg[0] = reg[rn] & 0xFF
+    reg[R.R0] = reg[rn] | reg[R.R0]
+    update_flags_02(R.R0)
+    reg[R.R0] = reg[rn] & 0xFF
     if (DEBUG == True):
         print( "or  " +"r"+str(rn)  )
 
 def and_(instr):
     # destination register
     rn = (instr) & 0x7
-    reg[0] = reg[rn] & reg[0]
-    update_flags_02(0)
-    reg[0] = reg[rn] & 0xFF
+    reg[R.R0] = reg[rn] & reg[R.R0]
+    update_flags_02(R.R0)
+    reg[R.R0] = reg[rn] & 0xFF
     if (DEBUG == True):
         print( "and " +"r"+str(rn)  )
 
 def xor(instr):
     # destination register
     rn = (instr) & 0x7
-    reg[0] = reg[rn] ^ reg[0]
-    update_flags_02(0)
-    reg[0] = reg[rn] & 0xFF
+    reg[R.R0] = reg[rn] ^ reg[R.R0]
+    update_flags_02(R.R0)
+    reg[R.R0] = reg[rn] & 0xFF
     if (DEBUG == True):
         print( "xor " +"r"+str(rn)  )
 
@@ -192,7 +194,7 @@ def ror(instr):
     rn = (instr) & 0x7
     tmp = reg[rn] & 0x1
     reg[rn] = (reg[rn] >>  1) | ((reg[R.PSR] << 7) & 0xFF) 
-    update_flags_02(0)
+    update_flags_02(rn)
     if (tmp):
         reg[R.PSR] |=  FL.CRY
     else:
@@ -213,18 +215,18 @@ def dec(instr):
 def sbc(instr):
     # destination register
     rn = (instr) & 0x7
-    reg[0] = reg[0] + (-reg[rn]) + ((reg[R.PSR] >> 1) & 0x1) 
-    update_flags_012(0)
-    reg[0] = reg[0] & 0xFF
+    reg[R.R0] = reg[R.R0] + (-reg[rn]) + ((reg[R.PSR] >> 1) & 0x1) 
+    update_flags_012(R.R0)
+    reg[R.R0] = reg[R.R0] & 0xFF
     if (DEBUG == True):
         print( "sbc " +"r"+str(rn)  )
 
 def add(instr):
     # destination register
     rn = (instr) & 0x7
-    reg[0] = reg[0] + reg[rn]
-    update_flags_012(0)
-    reg[0] = reg[0] & 0xFF
+    reg[R.R0] = reg[R.R0] + reg[rn]
+    update_flags_012(R.R0)
+    reg[R.R0] = reg[R.R0] & 0xFF
     if (DEBUG == True):
         print( "add " +"r"+str(rn)  )
 
@@ -233,42 +235,42 @@ def stp(instr):
     n = (instr) & 0x7
     reg[R.PSR] = reg[R.PSR] | ( 1 << n )
     if (DEBUG == True):
-        print( "dont yet")
+        print( "stp " + str(n))
 
 def btt(instr):
     # destination register
     n = (instr) & 0x7
-    if ~((reg[0] >> n) & 0x1):
+    if ~((reg[R.R0] >> n) & 0x1):
         reg[R.PSR] |=  FL.ZRO
     else:
         reg[R.PSR] = reg[R.PSR] & ~FL.ZRO
-    if (reg[0] >> 7)  & 0x1:
+    if (reg[R.R0] >> 7)  & 0x1:
         reg[R.PSR] |=  FL.NEG
     else:
         reg[R.PSR] = reg[R.PSR] & ~FL.NEG
     if (DEBUG == True):
-        print( "dont yet")
+        print( "btt " + str(n))
 
 def clp(instr):
     # destination register
     n = (instr) & 0x7
     reg[R.PSR] = reg[R.PSR] & ~( 1 << n )
     if (DEBUG == True):
-        print( "dont yet")
+        print( "clp " + str(n))
 
 def t0x(instr):
     # destination register
     rn = (instr) & 0x7
-    reg[rn] = reg[0] 
+    reg[rn] = reg[R.R0] 
     update_flags_02(rn)
-    reg[0] = reg[R.PSR] & 0xFF
+    reg[R.R0] = reg[R.PSR] & 0xFF
     if (DEBUG == True):
-        print( "dont yet")
+        print( "t0x " +"r"+str(rn)  )
 
 def cmp_(instr):
     # destination register
     rn = (instr) & 0x7
-    tmp= reg[0] + (-reg[rn])
+    tmp= reg[R.R0] + (-reg[rn])
     if tmp == 0:
         reg[R.PSR] |=  FL.ZRO
     else:
@@ -282,37 +284,42 @@ def cmp_(instr):
     else:
         reg[R.PSR] = reg[R.PSR] & ~FL.NEG
     if (DEBUG == True):
-        print( "dont yet")
+        print( "cmp " +"r"+str(rn)+"   psr "+bin(reg[R.PSR])  )
+    input("Waiting...")
 
 def psh(instr):
     rn = (instr) & 0x7
-    mem_write(reg[R.STACK], reg[rn])
     reg[R.STACK] = reg[R.STACK] - 1
+    mem_write(reg[R.STACK], reg[rn])
     if (DEBUG == True):
-        print( "dont yet")
+        print( "psh " +"r"+str(rn)  +"  stack_pt="+hex(reg[R.STACK]))
 
 def pop(instr):
     rn = (instr) & 0x7
     reg[rn] = mem_read(reg[R.STACK])
     reg[R.STACK] = reg[R.STACK] + 1
     if (DEBUG == True):
-        print( "dont yet")
+        print( "pop " +"r"+str(rn)+"  stack_pt="+hex(reg[R.STACK])  )
 
 def br0(instr):
     bit = (instr) & 0x7
     pc_offset = sign_extend((mem_read(reg[R.PC])) & 0xff, 8)
     if ((reg[R.PSR]>>bit) & 0x1) == 0:
-        reg[R.PC] += pc_offset
+        reg[R.PC] += pc_offset+1
+    else:
+        reg[R.PC] +=1
     if (DEBUG == True):
-        print( "dont yet")
+        print( "br0 " +str(bit)+" ."+str(pc_offset)  )
 
 def br1(instr):
     bit = (instr) & 0x7
     pc_offset = sign_extend((mem_read(reg[R.PC])) & 0xff, 8)
     if ((reg[R.PSR]>>bit) & 0x1) == 1:
-        reg[R.PC] += pc_offset
+        reg[R.PC] += pc_offset+1
+    else:
+        reg[R.PC] +=1
     if (DEBUG == True):
-        print( "dont yet")
+        print( "br1 " +str(bit)+" ."+str(pc_offset))
 
 def dbnz(instr):
     rn = (instr) & 0x7
@@ -323,12 +330,12 @@ def dbnz(instr):
     if ((reg[R.PSR]) & 0x1) == 1:
         reg[R.PC] += pc_offset
     if (DEBUG == True):
-        print( "dont yet")
+        print( "dbnz " +"r"+str(rn)+" "+str(pc_offset)  )
 
 def int_(instr):
     n = (instr) & 0x7
     if (DEBUG == True):
-        print( "dont yet")
+        print( "int")
     pass
     #if (n == 0) | ((((reg[R.PSR]>>3) & 0x1) == 1) & (((reg[R.INTERRUPT_MASK_REGISTER]>>n) & 0x1 )==1)):
     #    mem_write(reg[R.STACK],reg[R.PSR])
@@ -343,7 +350,7 @@ def int_(instr):
 
 def mul(instr):
     rn = (instr) & 0x7
-    tmp = reg[rn] * reg[0]
+    tmp = reg[rn] * reg[R.R0]
     reg[R.R1] = (tmp >> 8 ) & 0xFF
     reg[R.R0] = (tmp ) & 0xFF
     if tmp == 0:
@@ -351,56 +358,68 @@ def mul(instr):
     else:
         reg[R.PSR] = reg[R.PSR] & ~FL.ZRO
     if (DEBUG == True):
-        print( "dont yet")
+        print( "mul " +str(rn))
 
 def special (instr):
     select = (instr) & 0x7
     if select == 0:
                     if (Allow_Stack_Address_Move):
-                        reg[R.STACK] = reg[1] << 8 | reg[0]
+                        reg[R.STACK] = reg[1] << 8 | reg[R.R0]
                     else:
                         reg[R.STACK] = 0x007F
-            #RTS
-    elif select == 1:  
-                    reg[R.PC] = (mem_read(reg[R.STACK]+1) << 8) | mem_read(reg[R.STACK])
+                    if (DEBUG == True):
+                        print( "rsp ")
+            #RSP
+    elif select == 1:
+                    addr = (mem_read(reg[R.STACK]+1) << 8) | mem_read(reg[R.STACK])
+                    reg[R.PC] = addr
                     reg[R.STACK] += 2
-            #RTI
+                    if (DEBUG == True):
+                        print( "rts "+str(addr))
+            #RTS
     elif select == 2: 
                     reg[R.PC] = (mem_read(reg[R.STACK]+1) << 8) | mem_read(reg[R.STACK])
                     reg[R.PSR] = mem_read(reg[R.STACK]+2)
                     reg[R.STACK] += 3
-            #BRK
-    elif select == 3: 
-                    pass
-            #JMP
-    elif select == 4: 
-                    hi8 = mem_read(reg[R.PC])
-                    lo8 = mem_read(reg[R.PC]+1)
-                    reg[R.PC] = (hi8 << 8) | lo8
                     if (DEBUG == True):
-                        print( "dont yet")
-            #SMSK
+                        print( "rti ")
+            #RTI
+    elif select == 3: 
+                    if (DEBUG == True):
+                        print( "brk ")
+                    pass
+            #BRK
+    elif select == 4: 
+                    lo8 = mem_read(reg[R.PC])
+                    hi8 = mem_read(reg[R.PC]+1)
+                    addr = (hi8 << 8) | lo8
+                    reg[R.PC] = addr
+                    if (DEBUG == True):
+                        print( "jmp "+str(addr))
+            #JMP
     elif select == 5: 
                     if (DEBUG == True):
-                        print( "dont yet")
+                        print( "smsk")
                     pass
-            #GMSK
+            #SMSK
     elif select == 6: 
                     if (DEBUG == True):
-                        print( "dont yet")
+                        print( "gmsk")
                     pass
-            #JSR
+            #GMSK
     elif select == 7: 
                     tmp = reg[R.PC]+2
-                    hi8 = mem_read(reg[R.PC])
-                    lo8 = mem_read(reg[R.PC]+1)
-                    mem_write(reg[R.STACK],(tmp >> 8) & 0xFF)
+                    lo8 = mem_read(reg[R.PC])
+                    hi8 = mem_read(reg[R.PC]+1)
+                    addr = (hi8 << 8) | lo8
                     reg[R.STACK] -= 1
                     mem_write(reg[R.STACK],(tmp >> 8) & 0xFF)
                     reg[R.STACK] -= 1
-                    reg[R.PC] = (hi8 << 8) | lo8
+                    mem_write(reg[R.STACK],(tmp) & 0xFF)
+                    reg[R.PC] = addr
                     if (DEBUG == True):
-                        print( "dont yet")
+                        print( "jsr "+str(addr))
+            #JSR
     else: 
                     pass
 
@@ -414,7 +433,7 @@ def upp(instr):
     else:
         reg[R.PSR] = reg[R.PSR] & ~FL.CRY
     if (DEBUG == True):
-        print( "dont yet")
+        print( "upp "+"r"+str(rn))
 
 def sta(instr):
     rn = (instr) & 0x7
@@ -437,12 +456,15 @@ def stx(instr):
     reg[rn+1] = (addr >> 8) & 0xFF
     reg[rn] = addr & 0xFF
     if (DEBUG == True):
-        print( "dont yet")
+        if (a == 0):
+            print( "stx " +"r"+str(rn) )
+        else:
+            print( "stx " +"r"+str(rn)+"++"  )
 
 def sto(instr):
     rn = (instr) & 0x6
     a = (instr) & 0x1
-    offset = reg[R.PC]
+    offset = mem_read(reg[R.PC])
     hi8 = reg[rn+1]
     lo8 = reg[rn]
     addr = (hi8<<8) | lo8
@@ -452,7 +474,10 @@ def sto(instr):
     reg[rn] = addr & 0xFF
     reg[R.PC] += 1
     if (DEBUG == True):
-        print( "dont yet")
+        if (a == 0):
+            print( "sto " +"r"+str(rn)+" "+str(offset) )
+        else:
+            print( "sto " +"r"+str(rn)+"++ "+str(offset) )
 
 def ldi(instr):
     rn = (instr) & 0x7
@@ -465,14 +490,14 @@ def ldi(instr):
 
 def lda(instr):
     rn = (instr) & 0x7
-    hi8 = mem_read(reg[R.PC])
-    lo8 = mem_read(reg[R.PC]+1)
+    lo8 = mem_read(reg[R.PC])
+    hi8 = mem_read(reg[R.PC]+1)
     addr = (hi8<<8) | lo8
     reg[rn] = mem_read(addr)
     update_flags_02(rn)
     reg[R.PC] += 2
     if (DEBUG == True):
-        print( "dont yet")
+        print( "lda " +"r"+str(rn)+" "+str(addr)  )
 
 def ldx(instr):
     rn = (instr) & 0x6
@@ -487,12 +512,15 @@ def ldx(instr):
     reg[rn+1] = (addr >> 8) & 0xFF
     reg[rn] = addr & 0xFF
     if (DEBUG == True):
-        print( "dont yet")
+        if (a == 0):
+            print( "ldx " +"r"+str(rn) )
+        else:
+            print( "ldx " +"r"+str(rn)+"++"  )
 
 def ldo(instr):
     rn = (instr) & 0x6
     a = (instr) & 0x1
-    offset = reg[R.PC]
+    offset = mem_read(reg[R.PC])
     hi8 = reg[rn+1]
     lo8 = reg[rn]
     addr = (hi8<<8) | lo8
@@ -503,7 +531,10 @@ def ldo(instr):
     reg[rn] = addr & 0xFF
     reg[R.PC] += 1
     if (DEBUG == True):
-        print( "dont yet")
+        if (a == 0):
+            print( "ldo " +"r"+str(rn)+" "+str(offset) )
+        else:
+            print( "ldo " +"r"+str(rn)+"++ "+str(offset) )
 
 """
 TRAPs implementation
@@ -616,14 +647,32 @@ ops = {
     OP.STO: sto,
     OP.LDI: ldi,
     OP.LDA: lda,
-    OP.LDO: ldo,
-    OP.LDX: ldx
+    OP.LDX: ldx,
+    OP.LDO: ldo
 }
 
+class memory_map:
+    RAM_Address              = 0x0000 ### System RAM
+    ALU_Address              = 0x1000 ### ALU16 coprocessor
+    RTC_Address              = 0x1100 ### System Timer / RT Clock
+    ETC_Address              = 0x1200 ### Epoch Timer/Alarm Clock
+    TMR_Address              = 0x1400 ### PIT timer
+    SDLC_Address             = 0x1800 ### LCD serial interface
+    LED_Address              = 0x2000 ### LED Display
+    DSW_Address              = 0x2100 ### Dip Switches
+    BTN_Address              = 0x2200 ### Push Buttons
+    SER_Address              = 0x2400 ### UART interface
+    MAX_Address              = 0x2800 ### Max 7221 base address
+    VEC_Address              = 0x3000 ### Vector RX base address
+    CHR_Address              = 0x3100 ### Elapsed Time / Chronometer
+    ROM_Address              = 0x8000 ### Application ROM
+    ISR_Start_Addr           = 0xFFF0 ### ISR Vector Table
 
 class Mr:
-    KBSR = 0x2400  # keyboard status //uart
-    KBDR = 0x2402  # keyboard data   //
+    KBSR = memory_map.SER_Address
+    KBDR = memory_map.SER_Address
+    #KBSR = 0xFE00  # keyboard status //
+    #KBDR = 0xFE02  # keyboard data   //
 
 def check_key():
     _, o, _ = select.select([], [sys.stdin], [], 0)
@@ -635,17 +684,23 @@ def check_key():
 
 def mem_write(address, val):
     address = address % UINT16_MAX
+    global TERMINAL_OUT
+    if (address == memory_map.SER_Address ):
+        if TERMINAL_OUT:
+            sys.stdout.write(chr(val))
+            sys.stdout.flush()
     memory[address] = val
 
 
 def mem_read(address):
     address = address % UINT16_MAX
-    if address == Mr.KBSR:
+    if address == Mr.KBDR:
         if check_key():
-            memory[Mr.KBSR] = 1 << 15
+            #memory[Mr.KBSR] = 1 << 15
             memory[Mr.KBDR] = ord(getchar())
         else:
-            memory[Mr.KBSR] = 0
+            #memory[Mr.KBSR] = 0
+            memory[Mr.KBDR] = 0
     return memory[address]
 
 
@@ -683,7 +738,7 @@ def update_flags_02(r):
 def read_image_file(file_name):
     global memory
     with open(file_name, 'rb') as f:
-        origin = 0 #int.from_bytes(f.read(1), byteorder='big')
+        origin = memory_map.ROM_Address #int.from_bytes(f.read(1), byteorder='big')
         memory = array.array("B", [0] * origin)
         max_read = UINT16_MAX - origin
         memory.frombytes(f.read(max_read))
@@ -696,27 +751,65 @@ def read_image_file(file_name):
     #    memory.frombytes(f.read(max_read))
     #    memory.byteswap()
     #    memory.fromlist([0]*(UINT16_MAX - len(memory)))
-        print(memory)
+
+def dump_memory(file_name):
+    global memory
+    print(memory)
+    a = numpy.asarray(memory)
+    numpy.savetxt(file_name+".csv", a, delimiter=",")
+
+def dump_regfile():
+    global reg
+    print(reg)
+    with open('regfile.csv', 'w') as f:  
+        w = csv.DictWriter(f, reg.keys())
+        w.writeheader()
+        w.writerow(reg)
+
+Program_Start_Addr       = memory_map.ROM_Address 
+ISR_Start_Addr           = 0xFFFF
+Stack_Start_Addr         = 0x0FF0
+Allow_Stack_Address_Move = True
+Enable_Auto_Increment    = True
+BRK_Implements_WAI       = True
+Enable_NMI               = True
+Sequential_Interrupts    = True
+RTI_Ignores_GP_Flags     = True
+Default_Interrupt_Mask   = 0x00
+Clock_Frequency          = 100000000.0
 
 
 def main():
-    Allow_Stack_Address_Move = 0
     if len(sys.argv) < 2:
         print('vm.py [obj-file]')
         exit(2)
-
+    global DEBUG
+    global TERMINAL_OUT
+    global is_running
     file_path = sys.argv[1]
     read_image_file(file_path)
-
-    reg[R.PC] = PC_START
-
-    #while is_running:
-    for i in range(15):
+    DEBUG = False
+    TERMINAL_OUT = True
+    STEP = False
+    reg[R.PC] = Program_Start_Addr
+    reg[R.STACK] = Stack_Start_Addr
+    #dump_memory("initial")
+    while is_running:
+    #for i in range(15):
+        #print(reg)
+        if (DEBUG == True):
+            print(hex(reg[R.PC]), end="  ")
         instr = mem_read(reg[R.PC])
         reg[R.PC] += 1
         op = instr >> 3
         fun = ops.get(op, bad_opcode)
         fun(instr)
+        #dump_memory("final")
+        if (reg[R.PC] > 0x8198):
+            is_running = False
+        
+    #dump_memory("final")
+    #dump_regfile()
 
 
 

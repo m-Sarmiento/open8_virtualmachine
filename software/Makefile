@@ -1,7 +1,7 @@
 LINKER = open8_1.x
 #LINKER = rom.lds
 
-.PRECIOUS: %.o %.elf %.bin
+.PRECIOUS: %.o %.elf %.bin %.bc
 
 CC = clang
 DIS = llvm-dis
@@ -26,7 +26,7 @@ OBJDUMP = llvm-objdump
 
 .DEFAULT_GOAL := default
 
-default: main.S
+default: main.bc
 	make main.mem
 
 avr: main.cpp
@@ -38,15 +38,15 @@ avr: main.cpp
 	$(CC) -target avr -c $^ -emit-llvm -o $@
 	$(DIS) $@ -o main.ll
 
-%.S: %.bc
-	$(LLC) -march=urisc -relocation-model=pic -filetype=asm $^ -o $@ 
+#%.S: %.bc
+#	$(LLC) -march=urisc -relocation-model=pic -filetype=asm $^ -o $@ 
 #-debug
 
-#%.o: %.bc
-#	$(LLC) -march=urisc -relocation-model=pic -filetype=obj -debug $^ -o $@
+%.o: %.bc
+	$(LLC) -march=urisc -relocation-model=pic -filetype=obj -debug $^ -o $@
 
-%.o: %.S
-	$(AS) -arch=urisc --large-code-model=1 -filetype=obj $^ -o $@
+#%.o: %.S
+#	$(AS) -arch=urisc -filetype=obj $^ -o $@
 #	$(AS) $^ -o $@
 
 %.elf: %.o

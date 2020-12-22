@@ -3,7 +3,7 @@
 OUTPUT_ARCH(open8)
 MEMORY
 {
-  text   (rx)   : ORIGIN = 0x0000, LENGTH = 32K
+  text   (rx)   : ORIGIN = 0x8000, LENGTH = 32K
 }
 SECTIONS
 {
