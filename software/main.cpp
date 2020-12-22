@@ -108,11 +108,11 @@ void puts(char a){
 
 void delay(){
 	char a =0;
-	//for(unsigned int i = 0; i>2; i++){
-		for(unsigned int j = 0; j>2; j++){
+	for(char i = 0; i>2; i++){
+		for(char j = 0; j>200; j++){
 				a = a + 1;
 		}
-	//}
+	}
 }
 
 int main()
