@@ -133,7 +133,7 @@ def adc(instr):
     rn = (instr) & 0x7
     reg[R.R0] = reg[R.R0] + reg[rn] + ((reg[R.PSR] >> 1) & 0x1)
     update_flags_012(R.R0)
-    reg[R.R0] = reg[rn] & 0xFF
+    reg[R.R0] = reg[R.R0] & 0xFF
     if (DEBUG == True):
         print( "adc " +"r"+str(rn)  )
 
@@ -142,7 +142,7 @@ def tx0(instr):
     rn = (instr) & 0x7
     reg[R.R0] = reg[rn] 
     update_flags_02(R.R0)
-    reg[R.R0] = reg[rn] & 0xFF
+    reg[R.R0] = reg[R.R0] & 0xFF
     if (DEBUG == True):
         print( "tx0 " +"r"+str(rn)  )
 
@@ -151,7 +151,7 @@ def or_(instr):
     rn = (instr) & 0x7
     reg[R.R0] = reg[rn] | reg[R.R0]
     update_flags_02(R.R0)
-    reg[R.R0] = reg[rn] & 0xFF
+    reg[R.R0] = reg[R.R0] & 0xFF
     if (DEBUG == True):
         print( "or  " +"r"+str(rn)  )
 
@@ -160,7 +160,7 @@ def and_(instr):
     rn = (instr) & 0x7
     reg[R.R0] = reg[rn] & reg[R.R0]
     update_flags_02(R.R0)
-    reg[R.R0] = reg[rn] & 0xFF
+    reg[R.R0] = reg[R.R0] & 0xFF
     if (DEBUG == True):
         print( "and " +"r"+str(rn)  )
 
@@ -169,7 +169,7 @@ def xor(instr):
     rn = (instr) & 0x7
     reg[R.R0] = reg[rn] ^ reg[R.R0]
     update_flags_02(R.R0)
-    reg[R.R0] = reg[rn] & 0xFF
+    reg[R.R0] = reg[R.R0] & 0xFF
     if (DEBUG == True):
         print( "xor " +"r"+str(rn)  )
 
@@ -215,7 +215,7 @@ def dec(instr):
 def sbc(instr):
     # destination register
     rn = (instr) & 0x7
-    reg[R.R0] = reg[R.R0] + (-reg[rn]) + ((reg[R.PSR] >> 1) & 0x1) 
+    reg[R.R0] = reg[R.R0] + (-reg[rn]) - ((reg[R.PSR] >> 1) & 0x1) 
     update_flags_012(R.R0)
     reg[R.R0] = reg[R.R0] & 0xFF
     if (DEBUG == True):
@@ -263,7 +263,7 @@ def t0x(instr):
     rn = (instr) & 0x7
     reg[rn] = reg[R.R0] 
     update_flags_02(rn)
-    reg[R.R0] = reg[R.PSR] & 0xFF
+    reg[R.R0] = reg[R.R0] & 0xFF
     if (DEBUG == True):
         print( "t0x " +"r"+str(rn)  )
 
@@ -285,7 +285,7 @@ def cmp_(instr):
         reg[R.PSR] = reg[R.PSR] & ~FL.NEG
     if (DEBUG == True):
         print( "cmp " +"r"+str(rn)+"   psr "+bin(reg[R.PSR])  )
-    input("Waiting...")
+    #input("Waiting...")
 
 def psh(instr):
     rn = (instr) & 0x7
@@ -497,7 +497,7 @@ def lda(instr):
     update_flags_02(rn)
     reg[R.PC] += 2
     if (DEBUG == True):
-        print( "lda " +"r"+str(rn)+" "+str(addr)  )
+        print( "lda " +"r"+str(rn)+" "+str(addr)+" "+ str(reg[rn]) )
 
 def ldx(instr):
     rn = (instr) & 0x6
@@ -683,12 +683,16 @@ def check_key():
 
 
 def mem_write(address, val):
+    global is_running
     address = address % UINT16_MAX
     global TERMINAL_OUT
     if (address == memory_map.SER_Address ):
         if TERMINAL_OUT:
             sys.stdout.write(chr(val))
             sys.stdout.flush()
+    if ((address >= memory_map.ROM_Address) & (address <= memory_map.ISR_Start_Addr)):
+        is_running = False
+        print("Try to write rom memory in "+hex(address))
     memory[address] = val
 
 
@@ -701,6 +705,18 @@ def mem_read(address):
         else:
             #memory[Mr.KBSR] = 0
             memory[Mr.KBDR] = 0
+    if address == 0x0FA1:
+        return (reg[R.STACK] >> 8) & 0xFF
+    if address == 0x0FA0:
+        return (reg[R.STACK] ) & 0xFF
+    if address ==0x10e8:
+        return 121
+    if address ==0x10e9:
+        return 111
+    if address ==0x10ea:
+        return 117
+    if address ==0x10eb:
+        return 10
     return memory[address]
 
 
@@ -754,7 +770,7 @@ def read_image_file(file_name):
 
 def dump_memory(file_name):
     global memory
-    print(memory)
+    #print(memory)
     a = numpy.asarray(memory)
     numpy.savetxt(file_name+".csv", a, delimiter=",")
 
@@ -765,10 +781,24 @@ def dump_regfile():
         w = csv.DictWriter(f, reg.keys())
         w.writeheader()
         w.writerow(reg)
+def print_register():
+    global reg
+    print("r0  "+str(reg[R.R0])+" "+hex(reg[R.R0]))
+    print("r1  "+str(reg[R.R1])+" "+hex(reg[R.R1]))
+    print("r2  "+str(reg[R.R2])+" "+hex(reg[R.R2]))
+    print("r3  "+str(reg[R.R3])+" "+hex(reg[R.R3]))
+    print("r4  "+str(reg[R.R4])+" "+hex(reg[R.R4]))
+    print("r5  "+str(reg[R.R5])+" "+hex(reg[R.R5]))
+    print("r6  "+str(reg[R.R6])+" "+hex(reg[R.R6]))
+    print("r7  "+str(reg[R.R7])+" "+hex(reg[R.R7]))
+    print("PSR "+str(reg[R.PSR])+" "+hex(reg[R.PSR])+" "+bin(reg[R.PSR]))
+    print("PC+ "+str(reg[R.PC])+" "+hex(reg[R.PC]))
+    print("STK "+str(reg[R.STACK])+" "+hex(reg[R.STACK]))
+    print("VEC "+str(reg[R.VECTOR_BASE])+" "+hex(reg[R.VECTOR_BASE]))
 
 Program_Start_Addr       = memory_map.ROM_Address 
 ISR_Start_Addr           = 0xFFFF
-Stack_Start_Addr         = 0x0FF0
+Stack_Start_Addr         = 0x0FFE
 Allow_Stack_Address_Move = True
 Enable_Auto_Increment    = True
 BRK_Implements_WAI       = True
@@ -791,9 +821,11 @@ def main():
     DEBUG = False
     TERMINAL_OUT = True
     STEP = False
+    LIMIT = False
+    ADDR_LIMIT = 0x808e
     reg[R.PC] = Program_Start_Addr
     reg[R.STACK] = Stack_Start_Addr
-    #dump_memory("initial")
+    dump_memory("initial")
     while is_running:
     #for i in range(15):
         #print(reg)
@@ -804,13 +836,22 @@ def main():
         op = instr >> 3
         fun = ops.get(op, bad_opcode)
         fun(instr)
+        if (DEBUG == True):
+            print_register()
+        if(STEP):
+            dump_memory("final")
+            input("Waiting...")
         #dump_memory("final")
-        if (reg[R.PC] > 0x8198):
-            is_running = False
-        
-    #dump_memory("final")
+        if (reg[R.PC] == ADDR_LIMIT) & LIMIT:
+            #is_running = False
+            #print_register()
+            input("Waiting...")
+            dump_memory("final")
+           
+       
+    dump_memory("final")
     #dump_regfile()
-
+    #print_register() 
 
 
 if __name__ == '__main__':

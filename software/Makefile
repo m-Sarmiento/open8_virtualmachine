@@ -32,7 +32,7 @@ default: main.bc
 avr: main.cpp
 	$(CC) -target avr -c $^ -emit-llvm -o avr.bc
 	$(DIS) avr.bc -o avr.ll
-	$(LLC) -march=avr -relocation-model=pic -filetype=asm avr.bc -o avr.S --print-before=urisc-expand-pseudo
+	$(LLC) -march=avr -relocation-model=pic -filetype=asm avr.bc -o avr.S
 
 %.bc : %.cpp
 	$(CC) -target avr -c $^ -emit-llvm -o $@
@@ -43,7 +43,9 @@ avr: main.cpp
 #-debug
 
 %.o: %.bc
-	$(LLC) -march=urisc -relocation-model=pic -filetype=obj -debug $^ -o $@
+	$(LLC) -march=urisc -relocation-model=pic -filetype=asm $^ -o $(^:.bc=.S) 
+#-debug
+	$(LLC) -march=urisc -relocation-model=pic -filetype=obj $^ -o $@
 
 #%.o: %.S
 #	$(AS) -arch=urisc -filetype=obj $^ -o $@
@@ -58,7 +60,8 @@ avr: main.cpp
 	$(OBJDUMP) -D $^ > $(^:.elf=.dump)
 	cat $(^:.elf=.dump)
 	$(OBJDUMP) -D $^ > $(^:.elf=noaliases.dump)
-	$(OBJCOPY) -O binary $^ $@ --only-section=.text
+	$(OBJCOPY) -O binary $^ $@ 
+#   --only-section=.text
 #	$(OBJCOPY) -O binary $^ $@ --only-section=.data
 
 %.mem: %.bin

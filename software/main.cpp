@@ -14,153 +14,39 @@
 #define ROM_Address              0x8000 //Application ROM
 #define ISR_Start_Addr           0xFFF0 //ISR Vector Table
 
-/*int test_local_pointer()
-{
-unsigned int b = 3;
-unsigned int* p = &b;
-//return *p;
-//return 0;
-}*/
-
-asm(".section .progmem.data");
+/*asm(".section .progmem.data");
 asm(".globl _start");
 asm(".type _start,@function");
 asm("_start:");
 asm("inc r0");
 asm("inc r0");
 asm("xor r0");
-// check br instruction
-/*asm("ldi r2 0x42");
-asm("psh r2");
-asm("pop r3");
-asm("sta r3 0x2400");*/
-asm("stp 0");
-asm("br1 0 5");
-asm("inc r0");
-asm("inc r1");
-asm("inc r2");
-asm("inc r3");
-asm("inc r4");
-asm("inc r5");
-asm("inc r6");
-asm("inc r7");
-//chech all instructions
-/*asm("inc r1");
-asm("adc r2");
-asm("tx0 r3");
-asm("or r4");
-asm("and r5");
-asm("xor r6");
-asm("rol r7");
-asm("ror r6");
-asm("dec r5");
-asm("sbc r4");
-asm("add r3");
-asm("stp 3");
-asm("btt 5");
-asm("clp 3");
-asm("tx0 r2");
-asm("cmp r1");
-asm("psh r3");
-asm("pop r4");
-asm("br0 2 5");
-asm("br1 2 4");
-asm("dbnz r4 4");*/
-//asm("int 3");
-//asm("rti");
-
-
-asm("smsk");
-asm("sta r0 0x1100");
-asm("ldi r0 0x48");
-asm("sta r0 0x2400");
-asm("ldi r0 0x45");
-asm("sta r0 0x2400");
-asm("ldi r0 0x59");
-asm("sta r0 0x2400");
-asm("ldi r0 0x0A");
-asm("ldi r0, 0xfc");
-asm("sta r0, 0xfa0");
+asm("ldi r0, 0x06");
+asm("sta r0, 0x0fa0");
 asm("ldi r0, 0x0f");
-asm("sta r0, 0xfa1");
-asm("jsr _labe1");
-asm("ldi r0 0x0F");
-asm("sta r0 0x2000");
-asm("jmp main");
-asm("_labe1:");
-asm("psh r0");
-asm("psh r0");
-asm("pop r0");
-asm("pop r0");
-asm("rts");
-asm("ldi r0 0x0F");
-asm("sta r0 0x2000");
-asm("ldi r0, 0xf0");
-asm("sta r0, 0x2000");
-asm("jmp main");
-asm("jmp main");
-asm("jmp main");
-asm("jmp main");
+asm("sta r0, 0x0fa1");
+asm("jmp main");*/
+asm(".section .progmem.data");
+asm(".globl _start");
+asm(".type _start,@function");
+asm("_start:");
+asm("ldi r2 0xff");
+asm("tx0 r2");
+asm("t0x r0");
+asm("clc");
+asm("rol r0");
+asm("sbc r0");
+asm("t0x r3");
 
-void puts(char a){
-	*(char*)SER_Address = a;
-}
-
-void delay(){
-	char a =0;
-	for(char i = 0; i>2; i++){
-		for(char j = 0; j>200; j++){
-				a = a + 1;
-		}
-	}
-}
 
 int main()
 {
-//char led = 1;
-char read;
-char a;
-const char str[]="HEY\n";
-//unsigned int b = 200;
-while(1){
-	//read = *(char*)DSW_Address;
-	//*(char*)LED_Address = read + 1;
-	//for (unsigned int i = 0; i>4; i++){
-	
-	/*read = *(char*)SER_Address;
-	if(read == 'A'){
-	puts('b');}*/
-
-
-	
-	puts('M');
-	delay();
-	puts('A');
-	delay();
-	puts('R');
-	delay();
-	puts('C');
-	delay();
-	puts('O');
-	delay();
-	puts('\n');
-	delay();
-	// }
-	
-	/**(char*)LED_Address = 1;
-	delay();*/
-	/*for(unsigned int i = 0; i>200; i++)
-	{
-		for(unsigned int j = 0; j>200; j++)
-		{
-				a = a + 1;
-		}
-	}*/
-	/**(char*)LED_Address = 0;
-	delay();*/
-	//delay();	
-	//*(char*)LED_Address = 1;	
-	//delay();	
-}
+const char str[]="you\n";
+//*(char*)SER_Address = '\n';
+	for (char i = 0; i!=4; i++){
+		//*(char*)SER_Address = i+33;
+		*(char*)SER_Address = str[i];
+	}
+while(1){}
 	return 0;
 }
