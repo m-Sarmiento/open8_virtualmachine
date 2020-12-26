@@ -709,14 +709,14 @@ def mem_read(address):
         return (reg[R.STACK] >> 8) & 0xFF
     if address == 0x0FA0:
         return (reg[R.STACK] ) & 0xFF
-    if address ==0x10e8:
+    '''if address ==0x10e8:
         return 121
     if address ==0x10e9:
         return 111
     if address ==0x10ea:
         return 117
     if address ==0x10eb:
-        return 10
+        return 10'''
     return memory[address]
 
 
@@ -822,7 +822,7 @@ def main():
     TERMINAL_OUT = True
     STEP = False
     LIMIT = False
-    ADDR_LIMIT = 0x808e
+    ADDR_LIMIT = 0x80a5
     reg[R.PC] = Program_Start_Addr
     reg[R.STACK] = Stack_Start_Addr
     dump_memory("initial")
@@ -842,7 +842,7 @@ def main():
             dump_memory("final")
             input("Waiting...")
         #dump_memory("final")
-        if (reg[R.PC] == ADDR_LIMIT) & LIMIT:
+        if (reg[R.PC] >= ADDR_LIMIT) & LIMIT:
             #is_running = False
             #print_register()
             input("Waiting...")

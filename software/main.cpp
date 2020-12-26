@@ -21,12 +21,12 @@ asm("_start:");
 asm("inc r0");
 asm("inc r0");
 asm("xor r0");
-asm("ldi r0, 0x06");
-asm("sta r0, 0x0fa0");
+asm("ldi r0, 0xfc");
+asm("sta r0, 0xfa0");
 asm("ldi r0, 0x0f");
-asm("sta r0, 0x0fa1");
+asm("sta r0, 0xfa1");
 asm("jmp main");*/
-asm(".section .progmem.data");
+/*asm(".section .progmem.data");
 asm(".globl _start");
 asm(".type _start,@function");
 asm("_start:");
@@ -36,16 +36,28 @@ asm("t0x r0");
 asm("clc");
 asm("rol r0");
 asm("sbc r0");
-asm("t0x r3");
+asm("t0x r3");*/
 
+/*char factorial(char n) {
+   //base case
+   if(n == 0) {
+      return 1;
+   } else {
+      return n * factorial(n-1);
+   }
+}*/
 
 int main()
 {
-const char str[]="you\n";
+char x = 2;
+char y;
+const char str[]="hello world!\n";
 //*(char*)SER_Address = '\n';
-	for (char i = 0; i!=4; i++){
-		//*(char*)SER_Address = i+33;
-		*(char*)SER_Address = str[i];
+	for (char i = 0; i<33; i++){
+		//y = x * i;
+		//*(char*)SER_Address = i;
+		*(char*)SER_Address = i+33;
+		//*(char*)SER_Address = str[i];
 	}
 while(1){}
 	return 0;
