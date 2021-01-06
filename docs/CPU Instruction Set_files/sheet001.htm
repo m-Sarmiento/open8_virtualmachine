@@ -1,0 +1,820 @@
+<html xmlns:v="urn:schemas-microsoft-com:vml"
+xmlns:o="urn:schemas-microsoft-com:office:office"
+xmlns:x="urn:schemas-microsoft-com:office:excel"
+xmlns="http://www.w3.org/TR/REC-html40">
+
+<head>
+<meta http-equiv=Content-Type content="text/html; charset=windows-1252">
+<meta name=ProgId content=Excel.Sheet>
+<meta name=Generator content="Microsoft Excel 12">
+<link id=Main-File rel=Main-File href="../CPU%20Instruction%20Set.htm">
+<link rel=File-List href=filelist.xml>
+<link rel=Stylesheet href=stylesheet.css>
+<style>
+<!--table
+	{mso-displayed-decimal-separator:"\.";
+	mso-displayed-thousand-separator:"\,";}
+@page
+	{margin:.75in .7in .75in .7in;
+	mso-header-margin:.3in;
+	mso-footer-margin:.3in;}
+-->
+</style>
+<![if !supportTabStrip]><script language="JavaScript">
+<!--
+function fnUpdateTabs()
+ {
+  if (parent.window.g_iIEVer>=4) {
+   if (parent.document.readyState=="complete"
+    && parent.frames['frTabs'].document.readyState=="complete")
+   parent.fnSetActiveSheet(0);
+  else
+   window.setTimeout("fnUpdateTabs();",150);
+ }
+}
+
+if (window.name!="frSheet")
+ window.location.replace("../CPU%20Instruction%20Set.htm");
+else
+ fnUpdateTabs();
+//-->
+</script>
+<![endif]>
+</head>
+
+<body link=blue vlink=purple>
+
+<table border=0 cellpadding=0 cellspacing=0 width=1180 style='border-collapse:
+ collapse;table-layout:fixed;width:887pt'>
+ <col width=86 style='mso-width-source:userset;mso-width-alt:3145;width:65pt'>
+ <col class=xl67 width=74 style='mso-width-source:userset;mso-width-alt:2706;
+ width:56pt'>
+ <col class=xl67 width=61 style='mso-width-source:userset;mso-width-alt:2230;
+ width:46pt'>
+ <col class=xl66 width=64 style='width:48pt'>
+ <col class=xl68 width=670 style='mso-width-source:userset;mso-width-alt:24502;
+ width:503pt'>
+ <col width=64 style='width:48pt'>
+ <col width=97 style='mso-width-source:userset;mso-width-alt:3547;width:73pt'>
+ <col class=xl65 width=64 style='width:48pt'>
+ <tr height=35 style='height:26.25pt'>
+  <td height=35 width=86 style='height:26.25pt;width:65pt'></td>
+  <td class=xl67 width=74 style='width:56pt'></td>
+  <td class=xl67 width=61 style='width:46pt'></td>
+  <td class=xl106 colspan=2 width=734 style='mso-ignore:colspan;width:551pt'>Open8
+  Instruction Set</td>
+  <td width=64 style='width:48pt'></td>
+  <td width=97 style='width:73pt'></td>
+  <td class=xl65 width=64 style='width:48pt'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 style='height:15.0pt'></td>
+  <td colspan=2 class=xl67 style='mso-ignore:colspan'></td>
+  <td class=xl66></td>
+  <td class=xl68></td>
+  <td colspan=2 style='mso-ignore:colspan'></td>
+  <td class=xl65></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl69 style='height:15.0pt'>Instruction</td>
+  <td class=xl70>Opcode</td>
+  <td class=xl70>Operand</td>
+  <td class=xl71>Flags</td>
+  <td class=xl72 width=670 style='width:503pt'>Description</td>
+  <td></td>
+  <td class=xl105>Legend</td>
+  <td class=xl65></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl76 style='height:15.0pt;border-top:none'>INC R0-07</td>
+  <td class=xl77 style='border-top:none;border-left:none'>00000</td>
+  <td class=xl77 style='border-top:none;border-left:none'>xxx</td>
+  <td class=xl77 style='border-top:none;border-left:none'>N,C,Z</td>
+  <td class=xl78 width=670 style='border-top:none;border-left:none;width:503pt'>Increment
+  Register (Rn + 1 -&gt; Rn)</td>
+  <td></td>
+  <td class=xl76>ALU/MATH</td>
+  <td class=xl65></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl76 style='height:15.0pt;border-top:none'>ADC R0-07</td>
+  <td class=xl77 style='border-top:none;border-left:none'>00001</td>
+  <td class=xl77 style='border-top:none;border-left:none'>xxx</td>
+  <td class=xl77 style='border-top:none;border-left:none'>N,C,Z</td>
+  <td class=xl78 width=670 style='border-top:none;border-left:none;width:503pt'>Add
+  with Carry (Rn + R0 + C -&gt; R0)</td>
+  <td></td>
+  <td class=xl79 style='border-top:none'>LOAD/STORE</td>
+  <td class=xl65></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl76 style='height:15.0pt;border-top:none'>TX0 R0-R7</td>
+  <td class=xl77 style='border-top:none;border-left:none'>00010</td>
+  <td class=xl77 style='border-top:none;border-left:none'>xxx</td>
+  <td class=xl77 style='border-top:none;border-left:none'>N,Z</td>
+  <td class=xl78 width=670 style='border-top:none;border-left:none;width:503pt'>Transfer
+  Rn to R0 (Rn -&gt; R0)</td>
+  <td></td>
+  <td class=xl82 style='border-top:none'>BRANCH</td>
+  <td class=xl65></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl76 style='height:15.0pt;border-top:none'>OR<span
+  style='mso-spacerun:yes'>  </span>R0-R7</td>
+  <td class=xl77 style='border-top:none;border-left:none'>00011</td>
+  <td class=xl77 style='border-top:none;border-left:none'>xxx</td>
+  <td class=xl77 style='border-top:none;border-left:none'>N,Z</td>
+  <td class=xl78 width=670 style='border-top:none;border-left:none;width:503pt'>Logical
+  OR of Rn and R0 (Rn | R0 -&gt; R0)</td>
+  <td></td>
+  <td class=xl94 style='border-top:none'>STACK/FLOW</td>
+  <td class=xl65></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl76 style='height:15.0pt;border-top:none'>AND R0-R7</td>
+  <td class=xl77 style='border-top:none;border-left:none'>00100</td>
+  <td class=xl77 style='border-top:none;border-left:none'>xxx</td>
+  <td class=xl77 style='border-top:none;border-left:none'>N,Z</td>
+  <td class=xl78 width=670 style='border-top:none;border-left:none;width:503pt'>Logical
+  AND of Rn and R0 (Rn &amp; R0 -&gt; R0)</td>
+  <td></td>
+  <td class=xl104 style='border-top:none'>SOFT INTS</td>
+  <td class=xl65></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl76 style='height:15.0pt;border-top:none'>CLR R0</td>
+  <td class=xl77 style='border-top:none;border-left:none'>00101</td>
+  <td class=xl77 style='border-top:none;border-left:none'>000</td>
+  <td class=xl77 style='border-top:none;border-left:none'>N,Z</td>
+  <td class=xl78 width=670 style='border-top:none;border-left:none;width:503pt'>Special
+  case of XOR (R0^R0 -&gt; R0)</td>
+  <td colspan=2 style='mso-ignore:colspan'></td>
+  <td class=xl65></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl76 style='height:15.0pt;border-top:none'>XOR R0-R7</td>
+  <td class=xl77 style='border-top:none;border-left:none'>00101</td>
+  <td class=xl77 style='border-top:none;border-left:none'>xxx</td>
+  <td class=xl77 style='border-top:none;border-left:none'>N,Z</td>
+  <td class=xl78 width=670 style='border-top:none;border-left:none;width:503pt'>Logical
+  XOR or Rn and R0 (Rn ^ R0 -&gt; R0)</td>
+  <td colspan=2 style='mso-ignore:colspan'></td>
+  <td class=xl65></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl76 style='height:15.0pt;border-top:none'>ROL R0-R7</td>
+  <td class=xl77 style='border-top:none;border-left:none'>00110</td>
+  <td class=xl77 style='border-top:none;border-left:none'>xxx</td>
+  <td class=xl77 style='border-top:none;border-left:none'>N,C,Z</td>
+  <td class=xl78 width=670 style='border-top:none;border-left:none;width:503pt'>Rotate
+  Rn Left (Rn&lt;&lt;1 -&gt; Rn) (Note the carry is included in the
+  rotation:<span style='mso-spacerun:yes'>   </span>Rn(6:0) &amp; C -&gt; Rn ;
+  Rn(7) -&gt; C</td>
+  <td colspan=2 style='mso-ignore:colspan'></td>
+  <td class=xl65></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl76 style='height:15.0pt;border-top:none'>ROR R0-R7</td>
+  <td class=xl77 style='border-top:none;border-left:none'>00111</td>
+  <td class=xl77 style='border-top:none;border-left:none'>xxx</td>
+  <td class=xl77 style='border-top:none;border-left:none'>N,C,Z</td>
+  <td class=xl78 width=670 style='border-top:none;border-left:none;width:503pt'>Rotate
+  Rn Right (Rn&gt;&gt;1 -&gt; Rn) (Note the carry is included in the
+  rotation:<span style='mso-spacerun:yes'>   </span>C &amp; Rn(7:1) -&gt; Rn ;
+  Rn(0) -&gt; C</td>
+  <td colspan=2 style='mso-ignore:colspan'></td>
+  <td class=xl65></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl76 style='height:15.0pt;border-top:none'>DEC R0-R7</td>
+  <td class=xl77 style='border-top:none;border-left:none'>01000</td>
+  <td class=xl77 style='border-top:none;border-left:none'>xxx</td>
+  <td class=xl77 style='border-top:none;border-left:none'>N,C,Z</td>
+  <td class=xl78 width=670 style='border-top:none;border-left:none;width:503pt'>Decrement
+  Rn (Rn - 1 -&gt; Rn)</td>
+  <td colspan=2 style='mso-ignore:colspan'></td>
+  <td class=xl65></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl76 style='height:15.0pt;border-top:none'>SBC R0-R7</td>
+  <td class=xl77 style='border-top:none;border-left:none'>01001</td>
+  <td class=xl77 style='border-top:none;border-left:none'>xxx</td>
+  <td class=xl77 style='border-top:none;border-left:none'>N,C,Z</td>
+  <td class=xl78 width=670 style='border-top:none;border-left:none;width:503pt'>Subtract
+  Rn from R0 with carry (R0 - Rn - C -&gt; R0)</td>
+  <td colspan=2 style='mso-ignore:colspan'></td>
+  <td class=xl65></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl76 style='height:15.0pt;border-top:none'>ADD R0-R7</td>
+  <td class=xl77 style='border-top:none;border-left:none'>01010</td>
+  <td class=xl77 style='border-top:none;border-left:none'>xxx</td>
+  <td class=xl77 style='border-top:none;border-left:none'>N,C,Z</td>
+  <td class=xl78 width=670 style='border-top:none;border-left:none;width:503pt'>Add
+  Rn and R0 (R0 + Rn -&gt; R0)</td>
+  <td colspan=2 style='mso-ignore:colspan'></td>
+  <td class=xl65></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl88 style='height:15.0pt;border-top:none'>STP PSR_Z</td>
+  <td class=xl89 style='border-top:none;border-left:none'>01011</td>
+  <td class=xl89 style='border-top:none;border-left:none'>000</td>
+  <td class=xl89 style='border-top:none;border-left:none'>Z</td>
+  <td class=xl90 width=670 style='border-top:none;border-left:none;width:503pt'>Set
+  the ZERO flag in the status register</td>
+  <td colspan=2 style='mso-ignore:colspan'></td>
+  <td class=xl65></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl88 style='height:15.0pt;border-top:none'>STP PSR_C</td>
+  <td class=xl89 style='border-top:none;border-left:none'>01011</td>
+  <td class=xl89 style='border-top:none;border-left:none'>001</td>
+  <td class=xl89 style='border-top:none;border-left:none'>C</td>
+  <td class=xl90 width=670 style='border-top:none;border-left:none;width:503pt'>Set
+  the CARRY flag in the status register</td>
+  <td colspan=2 style='mso-ignore:colspan'></td>
+  <td class=xl65></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl88 style='height:15.0pt;border-top:none'>STP PSR_N</td>
+  <td class=xl89 style='border-top:none;border-left:none'>01011</td>
+  <td class=xl89 style='border-top:none;border-left:none'>010</td>
+  <td class=xl89 style='border-top:none;border-left:none'>N</td>
+  <td class=xl90 width=670 style='border-top:none;border-left:none;width:503pt'>Set
+  the NEGATIVE bit in the status register</td>
+  <td colspan=2 style='mso-ignore:colspan'></td>
+  <td class=xl65></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl88 style='height:15.0pt;border-top:none'>STP PSR_I</td>
+  <td class=xl89 style='border-top:none;border-left:none'>01011</td>
+  <td class=xl89 style='border-top:none;border-left:none'>011</td>
+  <td class=xl89 style='border-top:none;border-left:none'>I</td>
+  <td class=xl90 width=670 style='border-top:none;border-left:none;width:503pt'>set
+  the INTERRUPT bit in the status register</td>
+  <td colspan=2 style='mso-ignore:colspan'></td>
+  <td class=xl65></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl88 style='height:15.0pt;border-top:none'>STP PSR_GP4</td>
+  <td class=xl89 style='border-top:none;border-left:none'>01011</td>
+  <td class=xl89 style='border-top:none;border-left:none'>100</td>
+  <td class=xl89 style='border-top:none;border-left:none'>4</td>
+  <td class=xl90 width=670 style='border-top:none;border-left:none;width:503pt'>Set
+  General Purpose Flag 1 in the status register</td>
+  <td colspan=2 style='mso-ignore:colspan'></td>
+  <td class=xl65></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl88 style='height:15.0pt;border-top:none'>STP PSR_GP5</td>
+  <td class=xl89 style='border-top:none;border-left:none'>01011</td>
+  <td class=xl89 style='border-top:none;border-left:none'>101</td>
+  <td class=xl89 style='border-top:none;border-left:none'>5</td>
+  <td class=xl90 width=670 style='border-top:none;border-left:none;width:503pt'>Set
+  General Purpose Flag 2 in the status register</td>
+  <td colspan=2 style='mso-ignore:colspan'></td>
+  <td class=xl65></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl88 style='height:15.0pt;border-top:none'>STP PSR_GP6</td>
+  <td class=xl89 style='border-top:none;border-left:none'>01011</td>
+  <td class=xl89 style='border-top:none;border-left:none'>110</td>
+  <td class=xl89 style='border-top:none;border-left:none'>6</td>
+  <td class=xl90 width=670 style='border-top:none;border-left:none;width:503pt'>Set
+  General Purpose Flag 3 in the status register</td>
+  <td colspan=2 style='mso-ignore:colspan'></td>
+  <td class=xl65></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl88 style='height:15.0pt;border-top:none'>STP PSR_GP7</td>
+  <td class=xl89 style='border-top:none;border-left:none'>01011</td>
+  <td class=xl89 style='border-top:none;border-left:none'>111</td>
+  <td class=xl89 style='border-top:none;border-left:none'>7</td>
+  <td class=xl90 width=670 style='border-top:none;border-left:none;width:503pt'>Set
+  General Purpose Flag 4 in the status register</td>
+  <td colspan=2 style='mso-ignore:colspan'></td>
+  <td class=xl65></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl76 style='height:15.0pt;border-top:none'>BTT 0-7</td>
+  <td class=xl77 style='border-top:none;border-left:none'>01100</td>
+  <td class=xl77 style='border-top:none;border-left:none'>xxx</td>
+  <td class=xl77 style='border-top:none;border-left:none'>N,Z</td>
+  <td class=xl78 width=670 style='border-top:none;border-left:none;width:503pt'>Test
+  the nth bit in R0 (!R0(n) -&gt; Z, R0(7) -&gt; N)</td>
+  <td colspan=2 style='mso-ignore:colspan'></td>
+  <td class=xl65></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl88 style='height:15.0pt;border-top:none'>CLP PSR_Z</td>
+  <td class=xl89 style='border-top:none;border-left:none'>01101</td>
+  <td class=xl89 style='border-top:none;border-left:none'>000</td>
+  <td class=xl89 style='border-top:none;border-left:none'>Z</td>
+  <td class=xl90 width=670 style='border-top:none;border-left:none;width:503pt'>Clear
+  the ZERO flag in the status register</td>
+  <td colspan=2 style='mso-ignore:colspan'></td>
+  <td class=xl65></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl88 style='height:15.0pt;border-top:none'>CLP PSR_C</td>
+  <td class=xl89 style='border-top:none;border-left:none'>01101</td>
+  <td class=xl89 style='border-top:none;border-left:none'>001</td>
+  <td class=xl89 style='border-top:none;border-left:none'>C</td>
+  <td class=xl90 width=670 style='border-top:none;border-left:none;width:503pt'>Clear
+  the CARRY flag in the status register</td>
+  <td colspan=2 style='mso-ignore:colspan'></td>
+  <td class=xl65></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl88 style='height:15.0pt;border-top:none'>CLP PSR_N</td>
+  <td class=xl89 style='border-top:none;border-left:none'>01101</td>
+  <td class=xl89 style='border-top:none;border-left:none'>010</td>
+  <td class=xl89 style='border-top:none;border-left:none'>N</td>
+  <td class=xl90 width=670 style='border-top:none;border-left:none;width:503pt'>Clear
+  the NEGATIVE bit in the status register</td>
+  <td colspan=2 style='mso-ignore:colspan'></td>
+  <td class=xl65></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl88 style='height:15.0pt;border-top:none'>CLP PSR_I</td>
+  <td class=xl89 style='border-top:none;border-left:none'>01101</td>
+  <td class=xl89 style='border-top:none;border-left:none'>011</td>
+  <td class=xl89 style='border-top:none;border-left:none'>I</td>
+  <td class=xl90 width=670 style='border-top:none;border-left:none;width:503pt'>Clear
+  the INTERRUPT bit in the status register</td>
+  <td colspan=2 style='mso-ignore:colspan'></td>
+  <td class=xl65></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl88 style='height:15.0pt;border-top:none'>CLP PSR_GP4</td>
+  <td class=xl89 style='border-top:none;border-left:none'>01101</td>
+  <td class=xl89 style='border-top:none;border-left:none'>100</td>
+  <td class=xl89 style='border-top:none;border-left:none'>4</td>
+  <td class=xl90 width=670 style='border-top:none;border-left:none;width:503pt'>Clear
+  General Purpose Flag 1 in the status register</td>
+  <td colspan=2 style='mso-ignore:colspan'></td>
+  <td class=xl65></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl88 style='height:15.0pt;border-top:none'>CLP PSR_GP5</td>
+  <td class=xl89 style='border-top:none;border-left:none'>01101</td>
+  <td class=xl89 style='border-top:none;border-left:none'>101</td>
+  <td class=xl89 style='border-top:none;border-left:none'>5</td>
+  <td class=xl90 width=670 style='border-top:none;border-left:none;width:503pt'>Clear
+  General Purpose Flag 2 in the status register</td>
+  <td colspan=2 style='mso-ignore:colspan'></td>
+  <td class=xl65></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl88 style='height:15.0pt;border-top:none'>CLP PSR_GP6</td>
+  <td class=xl89 style='border-top:none;border-left:none'>01101</td>
+  <td class=xl89 style='border-top:none;border-left:none'>110</td>
+  <td class=xl89 style='border-top:none;border-left:none'>6</td>
+  <td class=xl90 width=670 style='border-top:none;border-left:none;width:503pt'>Clear
+  General Purpose Flag 3 in the status register</td>
+  <td colspan=2 style='mso-ignore:colspan'></td>
+  <td class=xl65></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl88 style='height:15.0pt;border-top:none'>CLP PSR_GP7</td>
+  <td class=xl89 style='border-top:none;border-left:none'>01101</td>
+  <td class=xl89 style='border-top:none;border-left:none'>111</td>
+  <td class=xl89 style='border-top:none;border-left:none'>7</td>
+  <td class=xl90 width=670 style='border-top:none;border-left:none;width:503pt'>Clear
+  General Purpose Flag 4 in the status register</td>
+  <td colspan=2 style='mso-ignore:colspan'></td>
+  <td class=xl65></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl76 style='height:15.0pt;border-top:none'>T0X R0-R7</td>
+  <td class=xl77 style='border-top:none;border-left:none'>01110</td>
+  <td class=xl77 style='border-top:none;border-left:none'>xxx</td>
+  <td class=xl77 style='border-top:none;border-left:none'>N,Z</td>
+  <td class=xl78 width=670 style='border-top:none;border-left:none;width:503pt'>Transfer
+  R0 to Rn (R0 -&gt; Rn)</td>
+  <td colspan=2 style='mso-ignore:colspan'></td>
+  <td class=xl65></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl76 style='height:15.0pt;border-top:none'>CMP R0-R7</td>
+  <td class=xl77 style='border-top:none;border-left:none'>01111</td>
+  <td class=xl77 style='border-top:none;border-left:none'>xxx</td>
+  <td class=xl77 style='border-top:none;border-left:none'>N,C,Z</td>
+  <td class=xl78 width=670 style='border-top:none;border-left:none;width:503pt'>Compare
+  R0 to Rn (Performs R0 - Rn, but only sets flags)</td>
+  <td colspan=2 style='mso-ignore:colspan'></td>
+  <td class=xl65></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl91 style='height:15.0pt;border-top:none'>PSH R0-R7</td>
+  <td class=xl92 style='border-top:none;border-left:none'>10000</td>
+  <td class=xl92 style='border-top:none;border-left:none'>xxx</td>
+  <td class=xl92 style='border-top:none;border-left:none'>-</td>
+  <td class=xl93 width=670 style='border-top:none;border-left:none;width:503pt'>Push
+  Rn to the stack</td>
+  <td colspan=2 style='mso-ignore:colspan'></td>
+  <td class=xl65></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl91 style='height:15.0pt;border-top:none'>POP R0-R7</td>
+  <td class=xl92 style='border-top:none;border-left:none'>10001</td>
+  <td class=xl92 style='border-top:none;border-left:none'>xxx</td>
+  <td class=xl92 style='border-top:none;border-left:none'>N,Z</td>
+  <td class=xl93 width=670 style='border-top:none;border-left:none;width:503pt'>Pop
+  Rn from the stack</td>
+  <td colspan=2 style='mso-ignore:colspan'></td>
+  <td class=xl65></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl85 style='height:15.0pt;border-top:none'>BNZ</td>
+  <td class=xl86 style='border-top:none;border-left:none'>10010</td>
+  <td class=xl86 style='border-top:none;border-left:none'>000</td>
+  <td class=xl86 style='border-top:none;border-left:none'>-</td>
+  <td class=xl87 width=670 style='border-top:none;border-left:none;width:503pt'>Branch
+  if the ZERO flag is NOT set (Branch on Not Zero)</td>
+  <td colspan=2 style='mso-ignore:colspan'></td>
+  <td class=xl65></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl85 style='height:15.0pt;border-top:none'>BNC</td>
+  <td class=xl86 style='border-top:none;border-left:none'>10010</td>
+  <td class=xl86 style='border-top:none;border-left:none'>001</td>
+  <td class=xl86 style='border-top:none;border-left:none'>-</td>
+  <td class=xl87 width=670 style='border-top:none;border-left:none;width:503pt'>Branch
+  if the CARRY flag is NOT set (Branch on Not Carry)</td>
+  <td colspan=2 style='mso-ignore:colspan'></td>
+  <td class=xl65></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl85 style='height:15.0pt;border-top:none'>BNN</td>
+  <td class=xl86 style='border-top:none;border-left:none'>10010</td>
+  <td class=xl86 style='border-top:none;border-left:none'>010</td>
+  <td class=xl86 style='border-top:none;border-left:none'>-</td>
+  <td class=xl87 width=670 style='border-top:none;border-left:none;width:503pt'>Branch
+  if the NEGATIVE flag is NOT set (Branch on Not Negative)</td>
+  <td colspan=2 style='mso-ignore:colspan'></td>
+  <td class=xl65></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl85 style='height:15.0pt;border-top:none'>BNI</td>
+  <td class=xl86 style='border-top:none;border-left:none'>10010</td>
+  <td class=xl86 style='border-top:none;border-left:none'>011</td>
+  <td class=xl86 style='border-top:none;border-left:none'>-</td>
+  <td class=xl87 width=670 style='border-top:none;border-left:none;width:503pt'>Branch
+  if the INTERRUPT flag is NOT set (Branch on Not Interrupt)</td>
+  <td colspan=2 style='mso-ignore:colspan'></td>
+  <td class=xl65></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl85 style='height:15.0pt;border-top:none'>BNGP4</td>
+  <td class=xl86 style='border-top:none;border-left:none'>10010</td>
+  <td class=xl86 style='border-top:none;border-left:none'>100</td>
+  <td class=xl86 style='border-top:none;border-left:none'>-</td>
+  <td class=xl87 width=670 style='border-top:none;border-left:none;width:503pt'>Branch
+  if General Purpose Flag 4 is NOT set</td>
+  <td colspan=2 style='mso-ignore:colspan'></td>
+  <td class=xl65></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl85 style='height:15.0pt;border-top:none'>BNGP5</td>
+  <td class=xl86 style='border-top:none;border-left:none'>10010</td>
+  <td class=xl86 style='border-top:none;border-left:none'>101</td>
+  <td class=xl86 style='border-top:none;border-left:none'>-</td>
+  <td class=xl87 width=670 style='border-top:none;border-left:none;width:503pt'>Branch
+  if General Purpose Flag 5 is NOT set</td>
+  <td colspan=2 style='mso-ignore:colspan'></td>
+  <td class=xl65></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl85 style='height:15.0pt;border-top:none'>BNGP6</td>
+  <td class=xl86 style='border-top:none;border-left:none'>10010</td>
+  <td class=xl86 style='border-top:none;border-left:none'>110</td>
+  <td class=xl86 style='border-top:none;border-left:none'>-</td>
+  <td class=xl87 width=670 style='border-top:none;border-left:none;width:503pt'>Branch
+  if General Purpose Flag 6 is NOT set</td>
+  <td colspan=2 style='mso-ignore:colspan'></td>
+  <td class=xl65></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl85 style='height:15.0pt;border-top:none'>BNGP7</td>
+  <td class=xl86 style='border-top:none;border-left:none'>10010</td>
+  <td class=xl86 style='border-top:none;border-left:none'>111</td>
+  <td class=xl86 style='border-top:none;border-left:none'>-</td>
+  <td class=xl87 width=670 style='border-top:none;border-left:none;width:503pt'>Branch
+  if General Purpose Flag 7 is NOT set</td>
+  <td colspan=2 style='mso-ignore:colspan'></td>
+  <td class=xl65></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl82 style='height:15.0pt;border-top:none'>BRZ</td>
+  <td class=xl83 style='border-top:none;border-left:none'>10011</td>
+  <td class=xl83 style='border-top:none;border-left:none'>000</td>
+  <td class=xl83 style='border-top:none;border-left:none'>-</td>
+  <td class=xl84 width=670 style='border-top:none;border-left:none;width:503pt'>Branch
+  if the ZERO flag is set (Branch on Zero)</td>
+  <td colspan=2 style='mso-ignore:colspan'></td>
+  <td class=xl65></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl82 style='height:15.0pt;border-top:none'>BRC</td>
+  <td class=xl83 style='border-top:none;border-left:none'>10011</td>
+  <td class=xl83 style='border-top:none;border-left:none'>001</td>
+  <td class=xl83 style='border-top:none;border-left:none'>-</td>
+  <td class=xl84 width=670 style='border-top:none;border-left:none;width:503pt'>Branch
+  if the CARRY flag is set (Branch on Carry)</td>
+  <td colspan=2 style='mso-ignore:colspan'></td>
+  <td class=xl65></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl82 style='height:15.0pt;border-top:none'>BRN</td>
+  <td class=xl83 style='border-top:none;border-left:none'>10011</td>
+  <td class=xl83 style='border-top:none;border-left:none'>010</td>
+  <td class=xl83 style='border-top:none;border-left:none'>-</td>
+  <td class=xl84 width=670 style='border-top:none;border-left:none;width:503pt'>Branch
+  if the NEGATIVE flag is set (Branch on Negative)</td>
+  <td colspan=2 style='mso-ignore:colspan'></td>
+  <td class=xl65></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl82 style='height:15.0pt;border-top:none'>BRI</td>
+  <td class=xl83 style='border-top:none;border-left:none'>10011</td>
+  <td class=xl83 style='border-top:none;border-left:none'>011</td>
+  <td class=xl83 style='border-top:none;border-left:none'>-</td>
+  <td class=xl84 width=670 style='border-top:none;border-left:none;width:503pt'>Branch
+  if the INTERRUPT flag is set (Branch on Interrupt)</td>
+  <td colspan=2 style='mso-ignore:colspan'></td>
+  <td class=xl65></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl82 style='height:15.0pt;border-top:none'>BRGP4</td>
+  <td class=xl83 style='border-top:none;border-left:none'>10011</td>
+  <td class=xl83 style='border-top:none;border-left:none'>100</td>
+  <td class=xl83 style='border-top:none;border-left:none'>-</td>
+  <td class=xl84 width=670 style='border-top:none;border-left:none;width:503pt'>Branch
+  if General Purpose Flag 4 is set</td>
+  <td colspan=2 style='mso-ignore:colspan'></td>
+  <td class=xl65></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl82 style='height:15.0pt;border-top:none'>BRGP5</td>
+  <td class=xl83 style='border-top:none;border-left:none'>10011</td>
+  <td class=xl83 style='border-top:none;border-left:none'>101</td>
+  <td class=xl83 style='border-top:none;border-left:none'>-</td>
+  <td class=xl84 width=670 style='border-top:none;border-left:none;width:503pt'>Branch
+  if General Purpose Flag 5 is set</td>
+  <td colspan=2 style='mso-ignore:colspan'></td>
+  <td class=xl65></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl82 style='height:15.0pt;border-top:none'>BRGP6</td>
+  <td class=xl83 style='border-top:none;border-left:none'>10011</td>
+  <td class=xl83 style='border-top:none;border-left:none'>110</td>
+  <td class=xl83 style='border-top:none;border-left:none'>-</td>
+  <td class=xl84 width=670 style='border-top:none;border-left:none;width:503pt'>Branch
+  if General Purpose Flag 6 is set</td>
+  <td colspan=2 style='mso-ignore:colspan'></td>
+  <td class=xl65></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl82 style='height:15.0pt;border-top:none'>BRGP7</td>
+  <td class=xl83 style='border-top:none;border-left:none'>10011</td>
+  <td class=xl83 style='border-top:none;border-left:none'>111</td>
+  <td class=xl83 style='border-top:none;border-left:none'>-</td>
+  <td class=xl84 width=670 style='border-top:none;border-left:none;width:503pt'>Branch
+  if General Purpose Flag 7 is set</td>
+  <td colspan=2 style='mso-ignore:colspan'></td>
+  <td class=xl65></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl97 style='height:15.0pt;border-top:none'>DBNZ R0-R7</td>
+  <td class=xl98 style='border-top:none;border-left:none'>10100</td>
+  <td class=xl98 style='border-top:none;border-left:none'>xxx</td>
+  <td class=xl98 style='border-top:none;border-left:none'>N,C,Z</td>
+  <td class=xl99 width=670 style='border-top:none;border-left:none;width:503pt'>Decrement
+  and Branch if Not Zero (Rn - 1 -&gt; Rn)</td>
+  <td colspan=2 style='mso-ignore:colspan'></td>
+  <td class=xl65></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl100 style='height:15.0pt;border-top:none'>INT 0-7</td>
+  <td class=xl101 style='border-top:none;border-left:none'>10101</td>
+  <td class=xl101 style='border-top:none;border-left:none'>xxx</td>
+  <td class=xl101 style='border-top:none;border-left:none'>-</td>
+  <td class=xl102 width=670 style='border-top:none;border-left:none;width:503pt'>Trigger
+  Interrupt n (Triggers the specified interrupt, then pauses the processor
+  until the ISR executes)</td>
+  <td colspan=2 style='mso-ignore:colspan'></td>
+  <td class=xl65></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl76 style='height:15.0pt;border-top:none'>MUL R0-R7</td>
+  <td class=xl77 style='border-top:none;border-left:none'>10110</td>
+  <td class=xl103 style='border-top:none;border-left:none'>xxx</td>
+  <td class=xl77 style='border-top:none;border-left:none'>Z</td>
+  <td class=xl78 width=670 style='border-top:none;border-left:none;width:503pt'>Multiply
+  Rn by R0 with results stored in R1:R0 (Rn * R0 -&gt; R1:R0)</td>
+  <td colspan=2 style='mso-ignore:colspan'></td>
+  <td class=xl65></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl94 style='height:15.0pt;border-top:none'>RSP</td>
+  <td class=xl95 style='border-top:none;border-left:none'>10111</td>
+  <td class=xl95 style='border-top:none;border-left:none'>000</td>
+  <td class=xl95 style='border-top:none;border-left:none'>-</td>
+  <td class=xl96 width=670 style='border-top:none;border-left:none;width:503pt'>Reset
+  (or Retrieve/Relocate) the Stack Pointer <font class="font5">(See CPU options
+  for exact behavior)</font></td>
+  <td colspan=2 style='mso-ignore:colspan'></td>
+  <td class=xl65></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl94 style='height:15.0pt;border-top:none'>RTS</td>
+  <td class=xl95 style='border-top:none;border-left:none'>10111</td>
+  <td class=xl95 style='border-top:none;border-left:none'>001</td>
+  <td class=xl95 style='border-top:none;border-left:none'>-</td>
+  <td class=xl96 width=670 style='border-top:none;border-left:none;width:503pt'>Return
+  from Subroutine (only pops the return address and jumps - does not affect
+  flags)</td>
+  <td colspan=2 style='mso-ignore:colspan'></td>
+  <td class=xl65></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl94 style='height:15.0pt;border-top:none'>RTI</td>
+  <td class=xl95 style='border-top:none;border-left:none'>10111</td>
+  <td class=xl95 style='border-top:none;border-left:none'>010</td>
+  <td class=xl95 style='border-top:none;border-left:none'>-</td>
+  <td class=xl96 width=670 style='border-top:none;border-left:none;width:503pt'>Return
+  from Interrupt (restores both the address and the status register)</td>
+  <td colspan=2 style='mso-ignore:colspan'></td>
+  <td class=xl65></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl94 style='height:15.0pt;border-top:none'>BRK/WAI</td>
+  <td class=xl95 style='border-top:none;border-left:none'>10111</td>
+  <td class=xl95 style='border-top:none;border-left:none'>011</td>
+  <td class=xl95 style='border-top:none;border-left:none'>-</td>
+  <td class=xl96 width=670 style='border-top:none;border-left:none;width:503pt'>Break
+  or Wait for Interrupt (See CPU options for exact behavior)</td>
+  <td colspan=2 style='mso-ignore:colspan'></td>
+  <td class=xl65></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl94 style='height:15.0pt;border-top:none'>JMP</td>
+  <td class=xl95 style='border-top:none;border-left:none'>10111</td>
+  <td class=xl95 style='border-top:none;border-left:none'>100</td>
+  <td class=xl95 style='border-top:none;border-left:none'>-</td>
+  <td class=xl96 width=670 style='border-top:none;border-left:none;width:503pt'>Jump
+  to Address (Address is assumed to be stored after the instruction)</td>
+  <td colspan=2 style='mso-ignore:colspan'></td>
+  <td class=xl65></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl94 style='height:15.0pt;border-top:none'>SMSK</td>
+  <td class=xl95 style='border-top:none;border-left:none'>10111</td>
+  <td class=xl95 style='border-top:none;border-left:none'>101</td>
+  <td class=xl95 style='border-top:none;border-left:none'>-</td>
+  <td class=xl96 width=670 style='border-top:none;border-left:none;width:503pt'>Set
+  the Interrupt Mask to the contents of R0 (R0 -&gt; MASK)</td>
+  <td colspan=2 style='mso-ignore:colspan'></td>
+  <td class=xl65></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl94 style='height:15.0pt;border-top:none'>GMSK</td>
+  <td class=xl95 style='border-top:none;border-left:none'>10111</td>
+  <td class=xl95 style='border-top:none;border-left:none'>110</td>
+  <td class=xl95 style='border-top:none;border-left:none'>-</td>
+  <td class=xl96 width=670 style='border-top:none;border-left:none;width:503pt'>Get
+  the Interrupt Mask and store to R0 (MASK -&gt; R0)</td>
+  <td colspan=2 style='mso-ignore:colspan'></td>
+  <td class=xl65></td>
+ </tr>
+ <tr height=21 style='mso-height-source:userset;height:15.75pt'>
+  <td height=21 class=xl94 style='height:15.75pt;border-top:none'>JSR</td>
+  <td class=xl95 style='border-top:none;border-left:none'>10111</td>
+  <td class=xl95 style='border-top:none;border-left:none'>111</td>
+  <td class=xl95 style='border-top:none;border-left:none'>-</td>
+  <td class=xl96 width=670 style='border-top:none;border-left:none;width:503pt'>Jump
+  to Subroutine (pushes the return address, then jumps to the address specified
+  in subsequent bytes)</td>
+  <td colspan=2 style='mso-ignore:colspan'></td>
+  <td class=xl65></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl76 style='height:15.0pt;border-top:none'>UPP R0-R7</td>
+  <td class=xl77 style='border-top:none;border-left:none'>11000</td>
+  <td class=xl77 style='border-top:none;border-left:none'>xxx</td>
+  <td class=xl77 style='border-top:none;border-left:none'>C</td>
+  <td class=xl78 width=670 style='border-top:none;border-left:none;width:503pt'>Increment
+  Register Pair (Rn+1:Rn + 1 -&gt; Rn+1:Rn)</td>
+  <td colspan=2 style='mso-ignore:colspan'></td>
+  <td class=xl65></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl79 style='height:15.0pt;border-top:none'>STA R0-R7</td>
+  <td class=xl80 style='border-top:none;border-left:none'>11001</td>
+  <td class=xl80 style='border-top:none;border-left:none'>xxx</td>
+  <td class=xl80 style='border-top:none;border-left:none'>-</td>
+  <td class=xl81 width=670 style='border-top:none;border-left:none;width:503pt'>Store
+  Rn to Fixed Address (Address follows instruction)</td>
+  <td colspan=2 style='mso-ignore:colspan'></td>
+  <td class=xl65></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl79 style='height:15.0pt;border-top:none'>STX R0-R7(+)</td>
+  <td class=xl80 style='border-top:none;border-left:none'>11010</td>
+  <td class=xl80 style='border-top:none;border-left:none'>xxx</td>
+  <td class=xl80 style='border-top:none;border-left:none'>(C*)</td>
+  <td class=xl81 width=670 style='border-top:none;border-left:none;width:503pt'>Store
+  R0 to Address referenced by Rn+1:Rn (See CPU options for exact behavior)</td>
+  <td colspan=2 style='mso-ignore:colspan'></td>
+  <td class=xl65></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl79 style='height:15.0pt;border-top:none'>STO R0-R7(+)</td>
+  <td class=xl80 style='border-top:none;border-left:none'>11011</td>
+  <td class=xl80 style='border-top:none;border-left:none'>xxx</td>
+  <td class=xl80 style='border-top:none;border-left:none'>(C*)</td>
+  <td class=xl81 width=670 style='border-top:none;border-left:none;width:503pt'>Store
+  R0 to Rn+1:Rn + Offset (Offset is stored in subsequent byte) (See CPU options
+  for exact behavior)</td>
+  <td colspan=2 style='mso-ignore:colspan'></td>
+  <td class=xl65></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl91 style='height:15.0pt;border-top:none'>LDI R0-R7</td>
+  <td class=xl92 style='border-top:none;border-left:none'>11100</td>
+  <td class=xl92 style='border-top:none;border-left:none'>xxx</td>
+  <td class=xl92 style='border-top:none;border-left:none'>N,Z</td>
+  <td class=xl93 width=670 style='border-top:none;border-left:none;width:503pt'>Load
+  Rn with Immediate Data (IMM -&gt; Rn) (Data is stored in subsequent byte)</td>
+  <td colspan=2 style='mso-ignore:colspan'></td>
+  <td class=xl65></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl91 style='height:15.0pt;border-top:none'>LDA R0-R7</td>
+  <td class=xl92 style='border-top:none;border-left:none'>11101</td>
+  <td class=xl92 style='border-top:none;border-left:none'>xxx</td>
+  <td class=xl92 style='border-top:none;border-left:none'>N,Z</td>
+  <td class=xl93 width=670 style='border-top:none;border-left:none;width:503pt'>Load
+  Rn from Fixed Address (Address follows instruction)</td>
+  <td colspan=2 style='mso-ignore:colspan'></td>
+  <td class=xl65></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl91 style='height:15.0pt;border-top:none'>LDX R0-R7(+)</td>
+  <td class=xl92 style='border-top:none;border-left:none'>11110</td>
+  <td class=xl92 style='border-top:none;border-left:none'>xxx</td>
+  <td class=xl92 style='border-top:none;border-left:none'>N,Z,(C*)</td>
+  <td class=xl93 width=670 style='border-top:none;border-left:none;width:503pt'>Load
+  R0 from Address referenced by Rn+1:Rn (See CPU options for exact behavior)</td>
+  <td colspan=2 style='mso-ignore:colspan'></td>
+  <td class=xl65></td>
+ </tr>
+ <tr height=40 style='height:30.0pt'>
+  <td height=40 class=xl91 style='height:30.0pt;border-top:none'>LDO R0-R7(+)</td>
+  <td class=xl92 style='border-top:none;border-left:none'>11111</td>
+  <td class=xl92 style='border-top:none;border-left:none'>xxx</td>
+  <td class=xl92 style='border-top:none;border-left:none'>N,Z,(C*)</td>
+  <td class=xl93 width=670 style='border-top:none;border-left:none;width:503pt'>Load
+  R0 from Address referenced by Rn+1:Rn plus an offset<span
+  style='mso-spacerun:yes'>  </span>(Offset is stored in subsequent byte) (See
+  CPU options for exact behavior)</td>
+  <td colspan=2 style='mso-ignore:colspan'></td>
+  <td class=xl65></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 style='height:15.0pt'></td>
+  <td colspan=2 class=xl67 style='mso-ignore:colspan'></td>
+  <td class=xl66></td>
+  <td class=xl68></td>
+  <td colspan=2 style='mso-ignore:colspan'></td>
+  <td class=xl65></td>
+ </tr>
+ <tr height=60 style='height:45.0pt'>
+  <td height=60 style='height:45.0pt'></td>
+  <td colspan=2 class=xl67 style='mso-ignore:colspan'></td>
+  <td class=xl66></td>
+  <td class=xl68 width=670 style='width:503pt'>Note - Indexed instructions with
+  (+) after the operand optionally allow for auto-incrementing of the register
+  pair. For example, LDX R4++ is equivalent to LDX R5 when auto-incrementing is
+  turned on) See CPU options for exact behavior)</td>
+  <td colspan=2 style='mso-ignore:colspan'></td>
+  <td class=xl65></td>
+ </tr>
+ <![if supportMisalignedColumns]>
+ <tr height=0 style='display:none'>
+  <td width=86 style='width:65pt'></td>
+  <td width=74 style='width:56pt'></td>
+  <td width=61 style='width:46pt'></td>
+  <td width=64 style='width:48pt'></td>
+  <td width=670 style='width:503pt'></td>
+  <td width=64 style='width:48pt'></td>
+  <td width=97 style='width:73pt'></td>
+  <td width=64 style='width:48pt'></td>
+ </tr>
+ <![endif]>
+</table>
+
+</body>
+
+</html>

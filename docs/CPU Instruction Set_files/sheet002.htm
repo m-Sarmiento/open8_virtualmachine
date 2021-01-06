@@ -1,0 +1,195 @@
+<html xmlns:o="urn:schemas-microsoft-com:office:office"
+xmlns:x="urn:schemas-microsoft-com:office:excel"
+xmlns="http://www.w3.org/TR/REC-html40">
+
+<head>
+<meta http-equiv=Content-Type content="text/html; charset=windows-1252">
+<meta name=ProgId content=Excel.Sheet>
+<meta name=Generator content="Microsoft Excel 12">
+<link id=Main-File rel=Main-File href="../CPU%20Instruction%20Set.htm">
+<link rel=File-List href=filelist.xml>
+<link rel=Stylesheet href=stylesheet.css>
+<style>
+<!--table
+	{mso-displayed-decimal-separator:"\.";
+	mso-displayed-thousand-separator:"\,";}
+@page
+	{margin:.75in .7in .75in .7in;
+	mso-header-margin:.3in;
+	mso-footer-margin:.3in;}
+-->
+</style>
+<![if !supportTabStrip]><script language="JavaScript">
+<!--
+function fnUpdateTabs()
+ {
+  if (parent.window.g_iIEVer>=4) {
+   if (parent.document.readyState=="complete"
+    && parent.frames['frTabs'].document.readyState=="complete")
+   parent.fnSetActiveSheet(1);
+  else
+   window.setTimeout("fnUpdateTabs();",150);
+ }
+}
+
+if (window.name!="frSheet")
+ window.location.replace("../CPU%20Instruction%20Set.htm");
+else
+ fnUpdateTabs();
+//-->
+</script>
+<![endif]>
+</head>
+
+<body link=blue vlink=purple>
+
+<table border=0 cellpadding=0 cellspacing=0 width=1242 style='border-collapse:
+ collapse;table-layout:fixed;width:932pt'>
+ <col width=185 style='mso-width-source:userset;mso-width-alt:6765;width:139pt'>
+ <col width=103 style='mso-width-source:userset;mso-width-alt:3766;width:77pt'>
+ <col class=xl67 width=61 style='mso-width-source:userset;mso-width-alt:2230;
+ width:46pt'>
+ <col class=xl68 width=893 style='mso-width-source:userset;mso-width-alt:32658;
+ width:670pt'>
+ <tr height=35 style='height:26.25pt'>
+  <td height=35 width=185 style='height:26.25pt;width:139pt'></td>
+  <td width=103 style='width:77pt'></td>
+  <td class=xl107 colspan=2 width=954 style='mso-ignore:colspan;width:716pt'>Open8
+  CPU Core Generics</td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 colspan=2 style='height:15.0pt;mso-ignore:colspan'></td>
+  <td class=xl67></td>
+  <td class=xl68></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl69 style='height:15.0pt'>Option</td>
+  <td class=xl69>Argument Type</td>
+  <td class=xl70>Default</td>
+  <td class=xl72 width=893 style='width:670pt'>Description</td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl76 style='height:15.0pt;border-top:none'>Program_Start_Addr</td>
+  <td class=xl76 style='border-top:none;border-left:none'>16-bit Address</td>
+  <td class=xl103 style='border-top:none;border-left:none'>x&quot;0000&quot;</td>
+  <td class=xl78 width=893 style='border-top:none;border-left:none;width:670pt'>Initial
+  program counter location</td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl73 style='height:15.0pt;border-top:none'>ISR_Start_Addr</td>
+  <td class=xl73 style='border-top:none;border-left:none'>16-bit Address</td>
+  <td class=xl74 style='border-top:none;border-left:none'>x&quot;FFF0&quot;</td>
+  <td class=xl75 width=893 style='border-top:none;border-left:none;width:670pt'>Sets
+  the initial location of the interrupt vector table</td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl76 style='height:15.0pt;border-top:none'>Stack_Start_Addr</td>
+  <td class=xl76 style='border-top:none;border-left:none'>16-bit Address</td>
+  <td class=xl103 style='border-top:none;border-left:none'>x&quot;03FF&quot;</td>
+  <td class=xl78 width=893 style='border-top:none;border-left:none;width:670pt'>Initial
+  location of the CPU Stack - Must be located in accessible RAM</td>
+ </tr>
+ <tr height=40 style='height:30.0pt'>
+  <td height=40 class=xl73 style='height:30.0pt;border-top:none'>Allow_Stack_Address_Move</td>
+  <td class=xl73 style='border-top:none;border-left:none'>Boolean</td>
+  <td class=xl74 style='border-top:none;border-left:none'>FALSE</td>
+  <td class=xl75 width=893 style='border-top:none;border-left:none;width:670pt'>If
+  false, the RSP instruction will reset the stack pointer to
+  &quot;Stack_Start_Addr&quot; by default. If true, the RSP instruction will
+  either allow the stack pointer to be loaded from R1:R0 or copied to R1:R0
+  depending on the status of the PSR_GP4 flag.</td>
+ </tr>
+ <tr height=80 style='height:60.0pt'>
+  <td height=80 class=xl108 style='height:60.0pt;border-top:none'>Enable_Auto_Increment</td>
+  <td class=xl108 style='border-top:none;border-left:none'>Boolean</td>
+  <td class=xl109 style='border-top:none;border-left:none'>FALSE</td>
+  <td class=xl110 width=893 style='border-top:none;border-left:none;width:670pt'>If
+  true, indexed instructions such as LDX, LDO, STX, STO will automatically
+  increment if an odd register is specified. The effect is similar to a normal
+  indexed instruction followed by an UPP instruction on the same register pair.
+  For example, LDX R5 (or LDX R4++) will result in R0 getting the data stored
+  at the address specified by R5:R4. Afterwards, the register pair R5:R4 will
+  be incremented by 1. If false, specifying either register in a register pair
+  will result in normal behavior.</td>
+ </tr>
+ <tr height=40 style='height:30.0pt'>
+  <td height=40 class=xl73 style='height:30.0pt;border-top:none'>BRK_Implements_WAI</td>
+  <td class=xl73 style='border-top:none;border-left:none'>Boolean</td>
+  <td class=xl74 style='border-top:none;border-left:none'>FALSE</td>
+  <td class=xl75 width=893 style='border-top:none;border-left:none;width:670pt'>If
+  true, the BRK instruction will cause the processor to halt as if an INT
+  instruction was executed, but without triggering an interrupt. This is useful
+  for pausing the CPU until an interrupt occurs. If false, the BRK instruction
+  simply causes the CPU to execute 5 NOP cycles.</td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl108 style='height:15.0pt;border-top:none'>Enable_NMI</td>
+  <td class=xl108 style='border-top:none;border-left:none'>Boolean</td>
+  <td class=xl109 style='border-top:none;border-left:none'>TRUE</td>
+  <td class=xl110 width=893 style='border-top:none;border-left:none;width:670pt'>Forces
+  bit 0 of the Interrupt Mask to 1, causing Interrupt 0 to be non-maskable.</td>
+ </tr>
+ <tr height=40 style='height:30.0pt'>
+  <td height=40 class=xl73 style='height:30.0pt;border-top:none'>Sequential_Interrupts</td>
+  <td class=xl73 style='border-top:none;border-left:none'>Boolean</td>
+  <td class=xl74 style='border-top:none;border-left:none'>FALSE</td>
+  <td class=xl75 width=893 style='border-top:none;border-left:none;width:670pt'>Prohibits
+  interrupts from initiating an ISR if the I-bit is set, making ISRs
+  sequential. This potentially blocks interrupt priority by allowing a lower
+  level interrupt to block a higher level interrupt. This can be fixed by
+  clearing the I-bit in interruptable ISRs.</td>
+ </tr>
+ <tr height=40 style='height:30.0pt'>
+  <td height=40 class=xl108 style='height:30.0pt;border-top:none'>RTI_Ignores_GP_Flags</td>
+  <td class=xl108 style='border-top:none;border-left:none'>Boolean</td>
+  <td class=xl109 style='border-top:none;border-left:none'>FALSE</td>
+  <td class=xl110 width=893 style='border-top:none;border-left:none;width:670pt'>If
+  set, preserves the general purpose flags GP_PSR4 to GP_PSR7 on ISR exit,
+  allowing them to be persistently set by interrupts. The lower four flag bits
+  are always restored.</td>
+ </tr>
+ <tr height=40 style='height:30.0pt'>
+  <td height=40 class=xl73 style='height:30.0pt;border-top:none'>Supervisor_Mode</td>
+  <td class=xl73 style='border-top:none;border-left:none'>Boolean</td>
+  <td class=xl74 style='border-top:none;border-left:none'>FALSE</td>
+  <td class=xl75 width=893 style='border-top:none;border-left:none;width:670pt'>If
+  set to true, enables restrictions on RSP, CLP/STP, and SMSK where they only
+  can alter internal registers if the I bit is set. Also initializes the CPU to
+  start with the I-bit set. If set to false, there are no restrictions on these
+  instructions.</td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl108 style='height:15.0pt;border-top:none'>Unsigned_Index_Offsets</td>
+  <td class=xl108 style='border-top:none;border-left:none'>Boolean</td>
+  <td class=xl109 style='border-top:none;border-left:none'>FALSE</td>
+  <td class=xl110 width=893 style='border-top:none;border-left:none;width:670pt'>Determines
+  whether the offset calculation for LDO/STO is signed or unsigned. Default
+  behavior is signed.</td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl73 style='height:15.0pt;border-top:none'>Default_Interrupt_Mask</td>
+  <td class=xl73 style='border-top:none;border-left:none'>8-bit Data</td>
+  <td class=xl74 style='border-top:none;border-left:none'>x&quot;FF&quot;</td>
+  <td class=xl75 width=893 style='border-top:none;border-left:none;width:670pt'>Sets
+  the initial interrupt mask (note that bit 0 is ignored, as this is the NMI)</td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl108 style='height:15.0pt;border-top:none'>Clock_Frequency</td>
+  <td class=xl108 style='border-top:none;border-left:none'>Real</td>
+  <td class=xl109 style='border-top:none;border-left:none'>-</td>
+  <td class=xl110 width=893 style='border-top:none;border-left:none;width:670pt'>Clock
+  frequency in Hz of the CPU clock. Used to configure the 1Mhz/1uSec tick pulse</td>
+ </tr>
+ <![if supportMisalignedColumns]>
+ <tr height=0 style='display:none'>
+  <td width=185 style='width:139pt'></td>
+  <td width=103 style='width:77pt'></td>
+  <td width=61 style='width:46pt'></td>
+  <td width=893 style='width:670pt'></td>
+ </tr>
+ <![endif]>
+</table>
+
+</body>
+
+</html>
