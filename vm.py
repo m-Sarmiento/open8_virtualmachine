@@ -108,6 +108,7 @@ class FL:
     CRY = 1 << 1  # Carry flag
     NEG = 1 << 2  # Negative flag
     INT = 1 << 3  # Interrupt enable
+    INT = 1 << 7  # Retrieve/Relocate Stack Pointer
 
 
 """
@@ -364,7 +365,12 @@ def special (instr):
     select = (instr) & 0x7
     if select == 0:
                     if (Allow_Stack_Address_Move):
-                        reg[R.STACK] = reg[1] << 8 | reg[R.R0]
+                        if ((reg[R.PSR])>> 7) & 0x1:
+                            reg[R.STACK] = reg[R.R1] << 8 | reg[R.R0]
+                        else:
+                            tmp = reg[R.STACK] 
+                            reg[R.R1]= (tmp >> 8) & 0xFF
+                            reg[R.R0]= (tmp >> 0) & 0xFF
                     else:
                         reg[R.STACK] = 0x007F
                     if (DEBUG == True):
@@ -705,18 +711,6 @@ def mem_read(address):
         else:
             #memory[Mr.KBSR] = 0
             memory[Mr.KBDR] = 0
-    if address == 0x0FA1:
-        return (reg[R.STACK] >> 8) & 0xFF
-    if address == 0x0FA0:
-        return (reg[R.STACK] ) & 0xFF
-    '''if address ==0x10e8:
-        return 121
-    if address ==0x10e9:
-        return 111
-    if address ==0x10ea:
-        return 117
-    if address ==0x10eb:
-        return 10'''
     return memory[address]
 
 
@@ -822,7 +816,7 @@ def main():
     TERMINAL_OUT = True
     STEP = False
     LIMIT = False
-    ADDR_LIMIT = 0x80a5
+    ADDR_LIMIT = 0x816A
     reg[R.PC] = Program_Start_Addr
     reg[R.STACK] = Stack_Start_Addr
     dump_memory("initial")
@@ -839,11 +833,12 @@ def main():
         if (DEBUG == True):
             print_register()
         if(STEP):
-            dump_memory("final")
             input("Waiting...")
+            dump_memory("final")
         #dump_memory("final")
-        if (reg[R.PC] >= ADDR_LIMIT) & LIMIT:
-            #is_running = False
+        if (reg[R.PC] == ADDR_LIMIT) & LIMIT:
+            #STEP = True
+            #LIMIT = False
             #print_register()
             input("Waiting...")
             dump_memory("final")

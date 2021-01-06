@@ -14,18 +14,22 @@
 #define ROM_Address              0x8000 //Application ROM
 #define ISR_Start_Addr           0xFFF0 //ISR Vector Table
 
-/*asm(".section .progmem.data");
+asm(".section .progmem.data");
 asm(".globl _start");
 asm(".type _start,@function");
 asm("_start:");
 asm("inc r0");
 asm("inc r0");
 asm("xor r0");
-asm("ldi r0, 0xfc");
-asm("sta r0, 0xfa0");
-asm("ldi r0, 0x0f");
-asm("sta r0, 0xfa1");
-asm("jmp main");*/
+asm("jmp main");
+/*asm("br1 0 5");
+asm("br1 1 5");
+asm("br1 2 5");
+asm("br1 3 5");
+asm("br0 0 5");
+asm("br0 1 5");
+asm("br0 2 5");
+asm("br0 3 5");*/
 /*asm(".section .progmem.data");
 asm(".globl _start");
 asm(".type _start,@function");
@@ -38,27 +42,32 @@ asm("rol r0");
 asm("sbc r0");
 asm("t0x r3");*/
 
-/*char factorial(char n) {
+char factorial(char n) {
    //base case
    if(n == 0) {
       return 1;
    } else {
       return n * factorial(n-1);
    }
-}*/
+}
 
 int main()
 {
-char x = 2;
+	/*int x = 257;
+	int y = 87;
+	y += x;*/
+	
+//char x = 2;
 char y;
 const char str[]="hello world!\n";
-//*(char*)SER_Address = '\n';
-	for (char i = 0; i<33; i++){
-		//y = x * i;
-		//*(char*)SER_Address = i;
-		*(char*)SER_Address = i+33;
+*(char*)SER_Address = '\n';
+	for (unsigned int i = 0; i<8; i++){
+		y = factorial(0);
+		//*(char*)SER_Address = y+33;
+		*(char*)SER_Address = str[i];
 		//*(char*)SER_Address = str[i];
 	}
+	*(char*)SER_Address = '\n';
 while(1){}
 	return 0;
 }

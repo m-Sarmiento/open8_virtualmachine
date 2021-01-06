@@ -73,6 +73,6 @@ move: main.mem
 #	cp ram.mem /home/marco/open8/open8_urisc_scala/sim/verilator/emulator/ram.mem
 
 clean:
-	-rm -rf *.mem *.bin *.elf *.o *.noaliases.dump *.dump *.S *.bc *.txt *.ll *.map *.ihex *.HEX
+	-rm -rf *.mem *.bin *.elf *.o *.noaliases.dump *.dump *.S *.bc *.txt *.ll *.map *.ihex *.HEX *.s *.log
 .PHONY: clean 
 .PHONY: move
