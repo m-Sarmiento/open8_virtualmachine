@@ -42,6 +42,30 @@ asm("rol r0");
 asm("sbc r0");
 asm("t0x r3");*/
 
+#define INT_DIGITS 19		/* enough for 64 bit integer */
+
+/*char *itoa(int i)
+{
+  // Room for INT_DIGITS digits, - and '\0' 
+  static char buf[INT_DIGITS + 2];
+  char *p = buf + INT_DIGITS + 1;	//points to terminating '\0' 
+  if (i >= 0) {
+    do {
+      *--p = '0' + (i % 10);
+      i /= 10;
+    } while (i != 0);
+    return p;
+  }
+  else {			// i < 0 
+    do {
+      *--p = '0' - (i % 10);
+      i /= 10;
+    } while (i != 0);
+    *--p = '-';
+  }
+  return p;
+}*/
+
 char factorial(char n) {
    //base case
    if(n == 0) {
@@ -51,6 +75,29 @@ char factorial(char n) {
    }
 }
 
+void puts(char n) {
+   *(char*)SER_Address = n;
+}
+
+void print_string(const char *str){
+  const char *p;
+  for (p = str; *p != '\0'; p++)
+	puts(*p);
+	puts(*p);
+	puts('\n');
+  return;
+}
+
+void print_hex(int num){
+	int a = num & 0x0F;
+	if (a > 9){
+		a = a+55;
+	}else{
+		a = a + 48;
+	}
+	puts((char)a);
+}
+
 int main()
 {
 	/*int x = 257;
@@ -58,16 +105,43 @@ int main()
 	y += x;*/
 	
 //char x = 2;
+char k = 'A';
+char* p;
+int a[3] = {1,2,3};
+p=&k;
+char j = 4 % 3;
 char y;
-const char str[]="hello world!\n";
+//long yy = 0x41FFFFFE;
+//float num = 1.5;
+int hh = 90; 
+int nmr = 0xFA;
+char kk = '0'; 
+char str[]="hello world!\n";
 *(char*)SER_Address = '\n';
-	for (unsigned int i = 0; i<8; i++){
-		y = factorial(0);
-		//*(char*)SER_Address = y+33;
-		*(char*)SER_Address = str[i];
+	for (int i = 0; i<-5; i--){
+		//y = factorial(i);
+		//y = i%2;
+		//yy = yy + 1;
+		//num = num + 31.5;
+		//*(char*)SER_Address = (char)(yy>>24);
+		puts(':');
 		//*(char*)SER_Address = str[i];
+		//*(char*)SER_Address = str[i];
+		//puts((char)(y+33));
+		//print_hex(nmr);
+		//hh--;
 	}
+
+	print_string(str);
+	*(char*)SER_Address = '_';
+	print_hex(nmr);
 	*(char*)SER_Address = '\n';
-while(1){}
+while(1){
+	y =*(char*)SER_Address;
+	//puts(y);
+	//if (y == 65){
+	//	puts('Z');
+	//}
+}
 	return 0;
 }

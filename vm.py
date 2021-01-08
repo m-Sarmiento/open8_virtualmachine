@@ -292,15 +292,17 @@ def psh(instr):
     rn = (instr) & 0x7
     reg[R.STACK] = reg[R.STACK] - 1
     mem_write(reg[R.STACK], reg[rn])
+    #reg[R.STACK] = reg[R.STACK] - 1
     if (DEBUG == True):
-        print( "psh " +"r"+str(rn)  +"  stack_pt="+hex(reg[R.STACK]))
+        print( "psh " +"r"+str(rn)  +"  stack_pt="+str(reg[R.STACK]))
 
 def pop(instr):
     rn = (instr) & 0x7
+    #reg[R.STACK] = reg[R.STACK] + 1
     reg[rn] = mem_read(reg[R.STACK])
     reg[R.STACK] = reg[R.STACK] + 1
     if (DEBUG == True):
-        print( "pop " +"r"+str(rn)+"  stack_pt="+hex(reg[R.STACK])  )
+        print( "pop " +"r"+str(rn)+"  stack_pt="+str(reg[R.STACK])  )
 
 def br0(instr):
     bit = (instr) & 0x7
@@ -474,16 +476,17 @@ def sto(instr):
     hi8 = reg[rn+1]
     lo8 = reg[rn]
     addr = (hi8<<8) | lo8
-    mem_write(addr+offset,reg[R.R0])
+    faddr=addr+offset
+    mem_write(faddr,reg[R.R0])
     addr += a
     reg[rn+1] = (addr >> 8) & 0xFF
     reg[rn] = addr & 0xFF
     reg[R.PC] += 1
     if (DEBUG == True):
         if (a == 0):
-            print( "sto " +"r"+str(rn)+" "+str(offset) )
+            print( "sto " +"r"+str(rn)+"   "+str(offset)+"  addr:"+str(faddr) )
         else:
-            print( "sto " +"r"+str(rn)+"++ "+str(offset) )
+            print( "sto " +"r"+str(rn)+"++ "+str(offset)+"  addr:"+str(faddr))
 
 def ldi(instr):
     rn = (instr) & 0x7
@@ -816,7 +819,7 @@ def main():
     TERMINAL_OUT = True
     STEP = False
     LIMIT = False
-    ADDR_LIMIT = 0x816A
+    ADDR_LIMIT = 0x8006
     reg[R.PC] = Program_Start_Addr
     reg[R.STACK] = Stack_Start_Addr
     dump_memory("initial")
@@ -837,8 +840,8 @@ def main():
             dump_memory("final")
         #dump_memory("final")
         if (reg[R.PC] == ADDR_LIMIT) & LIMIT:
-            #STEP = True
-            #LIMIT = False
+            STEP = True
+            LIMIT = False
             #print_register()
             input("Waiting...")
             dump_memory("final")

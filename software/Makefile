@@ -35,7 +35,8 @@ avr: main.cpp
 	$(LLC) -march=avr -relocation-model=pic -filetype=asm avr.bc -o avr.S
 
 %.bc : %.cpp
-	$(CC) -target avr -c $^ -emit-llvm -o $@
+	$(CC) -target avr -c $^ -emit-llvm -o $@ 
+#	$(CC) -c $^ -emit-llvm -o $@ 
 	$(DIS) $@ -o main.ll
 
 #%.S: %.bc
@@ -45,7 +46,7 @@ avr: main.cpp
 %.o: %.bc
 	$(LLC) -march=urisc -relocation-model=pic -filetype=asm $^ -o $(^:.bc=.S) 
 #-debug
-	$(LLC) -march=urisc -relocation-model=pic -filetype=obj $^ -o $@
+	$(LLC) -march=urisc -relocation-model=pic -filetype=obj $^ -o $@ --debugger-tune=gdb
 
 #%.o: %.S
 #	$(AS) -arch=urisc -filetype=obj $^ -o $@
