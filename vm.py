@@ -516,7 +516,6 @@ def ldx(instr):
     addr = (hi8<<8) | lo8
     reg[R.R0] = mem_read(addr) 
     update_flags_02(R.R0)
-    mem_write(addr,reg[R.R0])
     addr += a
     reg[rn+1] = (addr >> 8) & 0xFF
     reg[rn] = addr & 0xFF
@@ -819,7 +818,7 @@ def main():
     TERMINAL_OUT = True
     STEP = False
     LIMIT = False
-    ADDR_LIMIT = 0x8006
+    ADDR_LIMIT = 0x80de
     reg[R.PC] = Program_Start_Addr
     reg[R.STACK] = Stack_Start_Addr
     dump_memory("initial")

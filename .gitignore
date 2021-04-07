@@ -12,3 +12,4 @@
 *.json
 *.bin
 *.hex
+*.O
