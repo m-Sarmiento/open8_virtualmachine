@@ -1,8 +1,6 @@
 # Virtual Machine for Open8 assembly
 
-This is implementation of own virtual machine (VM) for  Open8 assembly language in `python`, inspired by [this tutorial](https://github.com/justinmeiners/lc3-vm).
-
-`software/` directory contains c files that can be compiled to test VM.
+This is implementation of a virtual machine (VM) for  Open8 assembly language in `python`, inspired by [this tutorial](https://github.com/justinmeiners/lc3-vm).
 
 ## Requirements
 
