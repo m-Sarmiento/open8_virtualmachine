@@ -15,14 +15,15 @@ import numpy
 import csv
 
 #Global variables
-UINT16_MAX   = 2 ** 16
-DEBUG        = False
-TERMINAL_OUT = True
-is_running   = True
-memory       = None
-LIMIT        = False
-ADDR_LIMIT   = 0x80ba
-STEP         = False
+UINT16_MAX    = 2 ** 16
+DEBUG         = False
+TERMINAL_OUT  = True
+is_running    = True
+memory        = None
+LIMIT         = False
+ADDR_LIMIT    = 0x808d
+STEP          = False
+CLOCK_COUNTER = 0
 
 def getchar():
     fd = sys.stdin.fileno()
@@ -58,7 +59,6 @@ class R:
     PC          = 10 # PROGRAM_COUNTER pointer to the currently executing instruction
     VECTOR_BASE = 11 # The implementation specific location of the interrupt vectors
     INTERRUPT_MASK_REGISTER = 12
-    CLOCK_COUNTER = 13
 
 
 class register_dict(dict):
@@ -67,7 +67,7 @@ class register_dict(dict):
         super().__setitem__(key, value % UINT16_MAX)
 
 
-reg = register_dict({i: 0 for i in range(R.CLOCK_COUNTER)})
+reg = register_dict({i: 0 for i in range(R.INTERRUPT_MASK_REGISTER)})
 
 
 class OP:
@@ -131,7 +131,8 @@ def inc(instr):
     reg[rn] = reg[rn] & 0xFF
     if (DEBUG == True):
         print( "inc " +"r"+str(rn)  )
-    reg[R.CLOCK_COUNTER]=reg[R.CLOCK_COUNTER] +1
+    global CLOCK_COUNTER
+    CLOCK_COUNTER=CLOCK_COUNTER +1
 
 def adc(instr):
     # destination register
@@ -141,7 +142,8 @@ def adc(instr):
     reg[R.R0] = reg[R.R0] & 0xFF
     if (DEBUG == True):
         print( "adc " +"r"+str(rn)  )
-    reg[R.CLOCK_COUNTER]=reg[R.CLOCK_COUNTER] +1
+    global CLOCK_COUNTER
+    CLOCK_COUNTER=CLOCK_COUNTER +1
 
 def tx0(instr):
     # destination register
@@ -151,7 +153,8 @@ def tx0(instr):
     reg[R.R0] = reg[R.R0] & 0xFF
     if (DEBUG == True):
         print( "tx0 " +"r"+str(rn)  )
-    reg[R.CLOCK_COUNTER]=reg[R.CLOCK_COUNTER] +1
+    global CLOCK_COUNTER
+    CLOCK_COUNTER=CLOCK_COUNTER +1
 
 def or_(instr):
     # destination register
@@ -161,7 +164,8 @@ def or_(instr):
     reg[R.R0] = reg[R.R0] & 0xFF
     if (DEBUG == True):
         print( "or  " +"r"+str(rn)  )
-    reg[R.CLOCK_COUNTER]=reg[R.CLOCK_COUNTER] +1
+    global CLOCK_COUNTER
+    CLOCK_COUNTER=CLOCK_COUNTER +1
 
 def and_(instr):
     # destination register
@@ -171,7 +175,8 @@ def and_(instr):
     reg[R.R0] = reg[R.R0] & 0xFF
     if (DEBUG == True):
         print( "and " +"r"+str(rn)  )
-    reg[R.CLOCK_COUNTER]=reg[R.CLOCK_COUNTER] +1
+    global CLOCK_COUNTER
+    CLOCK_COUNTER=CLOCK_COUNTER +1
 
 def xor(instr):
     # destination register
@@ -181,7 +186,8 @@ def xor(instr):
     reg[R.R0] = reg[R.R0] & 0xFF
     if (DEBUG == True):
         print( "xor " +"r"+str(rn))
-    reg[R.CLOCK_COUNTER]=reg[R.CLOCK_COUNTER] +1
+    global CLOCK_COUNTER
+    CLOCK_COUNTER=CLOCK_COUNTER +1
 
 def rol(instr):
     # destination register
@@ -196,7 +202,8 @@ def rol(instr):
     reg[rn] = reg[rn] &  0xFF
     if (DEBUG == True):
         print( "rol " +"r"+str(rn)  )
-    reg[R.CLOCK_COUNTER]=reg[R.CLOCK_COUNTER] +1
+    global CLOCK_COUNTER
+    CLOCK_COUNTER=CLOCK_COUNTER +1
 
 
 
@@ -213,7 +220,8 @@ def ror(instr):
     reg[rn] = reg[rn] &  0xFF
     if (DEBUG == True):
         print( "ror " +"r"+str(rn)  )
-    reg[R.CLOCK_COUNTER]=reg[R.CLOCK_COUNTER] +1
+    global CLOCK_COUNTER
+    CLOCK_COUNTER=CLOCK_COUNTER +1
 
 def dec(instr):
     # destination register
@@ -223,7 +231,8 @@ def dec(instr):
     reg[rn] = reg[rn] &  0xFF
     if (DEBUG == True):
         print( "dec " +"r"+str(rn)  )
-    reg[R.CLOCK_COUNTER]=reg[R.CLOCK_COUNTER] +1
+    global CLOCK_COUNTER
+    CLOCK_COUNTER=CLOCK_COUNTER +1
 
 def sbc(instr):
     # destination register
@@ -233,7 +242,8 @@ def sbc(instr):
     reg[R.R0] = reg[R.R0] & 0xFF
     if (DEBUG == True):
         print( "sbc " +"r"+str(rn)  )
-    reg[R.CLOCK_COUNTER]=reg[R.CLOCK_COUNTER] +1
+    global CLOCK_COUNTER
+    CLOCK_COUNTER=CLOCK_COUNTER +1
 
 def add(instr):
     # destination register
@@ -243,7 +253,8 @@ def add(instr):
     reg[R.R0] = reg[R.R0] & 0xFF
     if (DEBUG == True):
         print( "add " +"r"+str(rn)  )
-    reg[R.CLOCK_COUNTER]=reg[R.CLOCK_COUNTER] +1
+    global CLOCK_COUNTER
+    CLOCK_COUNTER=CLOCK_COUNTER +1
 
 def stp(instr):
     # destination register
@@ -251,7 +262,8 @@ def stp(instr):
     reg[R.PSR] = reg[R.PSR] | ( 1 << n )
     if (DEBUG == True):
         print( "stp " + str(n))
-    reg[R.CLOCK_COUNTER]=reg[R.CLOCK_COUNTER] +1
+    global CLOCK_COUNTER
+    CLOCK_COUNTER=CLOCK_COUNTER +1
 
 def btt(instr):
     # destination register
@@ -266,7 +278,8 @@ def btt(instr):
         reg[R.PSR] = reg[R.PSR] & ~FL.NEG
     if (DEBUG == True):
         print( "btt " + str(n))
-    reg[R.CLOCK_COUNTER]=reg[R.CLOCK_COUNTER] +1
+    global CLOCK_COUNTER
+    CLOCK_COUNTER=CLOCK_COUNTER +1
 
 def clp(instr):
     # destination register
@@ -274,7 +287,8 @@ def clp(instr):
     reg[R.PSR] = reg[R.PSR] & ~( 1 << n )
     if (DEBUG == True):
         print( "clp " + str(n))
-    reg[R.CLOCK_COUNTER]=reg[R.CLOCK_COUNTER] +1
+    global CLOCK_COUNTER
+    CLOCK_COUNTER=CLOCK_COUNTER +1
 
 def t0x(instr):
     # destination register
@@ -284,7 +298,8 @@ def t0x(instr):
     reg[R.R0] = reg[R.R0] & 0xFF
     if (DEBUG == True):
         print( "t0x " +"r"+str(rn)  )
-    reg[R.CLOCK_COUNTER]=reg[R.CLOCK_COUNTER] +1
+    global CLOCK_COUNTER
+    CLOCK_COUNTER=CLOCK_COUNTER +1
 
 def cmp_(instr):
     # destination register
@@ -304,7 +319,8 @@ def cmp_(instr):
         reg[R.PSR] = reg[R.PSR] & ~FL.NEG
     if (DEBUG == True):
         print( "cmp " +"r"+str(rn)+"   psr "+bin(reg[R.PSR])  )
-    reg[R.CLOCK_COUNTER]=reg[R.CLOCK_COUNTER] +1
+    global CLOCK_COUNTER
+    CLOCK_COUNTER=CLOCK_COUNTER +1
     #input("Waiting...")
 
 def psh(instr):
@@ -314,7 +330,8 @@ def psh(instr):
     #reg[R.STACK] = reg[R.STACK] - 1
     if (DEBUG == True):
         print( "psh " +"r"+str(rn)  +"  stack_pt="+str(reg[R.STACK]))
-    reg[R.CLOCK_COUNTER]=reg[R.CLOCK_COUNTER] +3
+    global CLOCK_COUNTER
+    CLOCK_COUNTER=CLOCK_COUNTER +3
 
 def pop(instr):
     rn = (instr) & 0x7
@@ -323,7 +340,8 @@ def pop(instr):
     reg[R.STACK] = reg[R.STACK] + 1
     if (DEBUG == True):
         print( "pop " +"r"+str(rn)+"  stack_pt="+str(reg[R.STACK])  )
-    reg[R.CLOCK_COUNTER]=reg[R.CLOCK_COUNTER] +3
+    global CLOCK_COUNTER
+    CLOCK_COUNTER=CLOCK_COUNTER +3
 
 def br0(instr):
     bit = (instr) & 0x7
@@ -334,7 +352,8 @@ def br0(instr):
         reg[R.PC] +=1
     if (DEBUG == True):
         print( "br0 " +str(bit)+" ."+str(pc_offset)  )
-    reg[R.CLOCK_COUNTER]=reg[R.CLOCK_COUNTER] +3
+    global CLOCK_COUNTER
+    CLOCK_COUNTER=CLOCK_COUNTER +3
 
 def br1(instr):
     bit = (instr) & 0x7
@@ -345,7 +364,8 @@ def br1(instr):
         reg[R.PC] +=1
     if (DEBUG == True):
         print( "br1 " +str(bit)+" ."+str(pc_offset))
-    reg[R.CLOCK_COUNTER]=reg[R.CLOCK_COUNTER] +3
+    global CLOCK_COUNTER
+    CLOCK_COUNTER=CLOCK_COUNTER +3
 
 def dbnz(instr):
     rn = (instr) & 0x7
@@ -357,13 +377,15 @@ def dbnz(instr):
         reg[R.PC] += pc_offset
     if (DEBUG == True):
         print( "dbnz " +"r"+str(rn)+" "+str(pc_offset)  )
-    reg[R.CLOCK_COUNTER]=reg[R.CLOCK_COUNTER] +3
+    global CLOCK_COUNTER
+    CLOCK_COUNTER=CLOCK_COUNTER +3
 
 def int_(instr):
     n = (instr) & 0x7
     if (DEBUG == True):
         print( "int")
-    reg[R.CLOCK_COUNTER]=reg[R.CLOCK_COUNTER] +7
+    global CLOCK_COUNTER
+    CLOCK_COUNTER=CLOCK_COUNTER +7
     pass
     #TODO: complete
     #if (n == 0) | ((((reg[R.PSR]>>3) & 0x1) == 1) & (((reg[R.INTERRUPT_MASK_REGISTER]>>n) & 0x1 )==1)):
@@ -388,10 +410,12 @@ def mul(instr):
         reg[R.PSR] = reg[R.PSR] & ~FL.ZRO
     if (DEBUG == True):
         print( "mul " +str(rn))
-    reg[R.CLOCK_COUNTER]=reg[R.CLOCK_COUNTER] +2
+    global CLOCK_COUNTER
+    CLOCK_COUNTER=CLOCK_COUNTER +2
 
 def special (instr):
     select = (instr) & 0x7
+    global CLOCK_COUNTER
     if select == 0:
                     if (Allow_Stack_Address_Move):
                         if ((reg[R.PSR])>> 7) & 0x1:
@@ -404,7 +428,7 @@ def special (instr):
                         reg[R.STACK] = 0x007F
                     if (DEBUG == True):
                         print( "rsp ")
-                    reg[R.CLOCK_COUNTER]=reg[R.CLOCK_COUNTER] +5 # due to retrive restore
+                    CLOCK_COUNTER=CLOCK_COUNTER +5 # due to retrive restore
             #RSP
     elif select == 1:
                     addr = (mem_read(reg[R.STACK]+1) << 8) | mem_read(reg[R.STACK])
@@ -412,7 +436,7 @@ def special (instr):
                     reg[R.STACK] += 2
                     if (DEBUG == True):
                         print( "rts "+str(addr))
-                    reg[R.CLOCK_COUNTER]=reg[R.CLOCK_COUNTER] +5
+                    CLOCK_COUNTER=CLOCK_COUNTER +5
             #RTS
     elif select == 2: 
                     reg[R.PC] = (mem_read(reg[R.STACK]+1) << 8) | mem_read(reg[R.STACK])
@@ -420,12 +444,12 @@ def special (instr):
                     reg[R.STACK] += 3
                     if (DEBUG == True):
                         print( "rti ")
-                    reg[R.CLOCK_COUNTER]=reg[R.CLOCK_COUNTER] +5
+                    CLOCK_COUNTER=CLOCK_COUNTER +5
             #RTI
     elif select == 3: 
                     if (DEBUG == True):
                         print( "brk ")
-                    reg[R.CLOCK_COUNTER]=reg[R.CLOCK_COUNTER] +1
+                    CLOCK_COUNTER=CLOCK_COUNTER +1
                     pass
             #BRK
     elif select == 4: 
@@ -435,18 +459,18 @@ def special (instr):
                     reg[R.PC] = addr
                     if (DEBUG == True):
                         print( "jmp "+str(addr))
-                    reg[R.CLOCK_COUNTER]=reg[R.CLOCK_COUNTER] +3
+                    CLOCK_COUNTER=CLOCK_COUNTER +3
             #JMP
     elif select == 5: 
                     if (DEBUG == True):
                         print( "smsk")
-                    reg[R.CLOCK_COUNTER]=reg[R.CLOCK_COUNTER] +1
+                    CLOCK_COUNTER=CLOCK_COUNTER +1
                     pass
             #SMSK
     elif select == 6: 
                     if (DEBUG == True):
                         print( "gmsk")
-                    reg[R.CLOCK_COUNTER]=reg[R.CLOCK_COUNTER] +1
+                    CLOCK_COUNTER=CLOCK_COUNTER +1
                     pass
             #GMSK
     elif select == 7: 
@@ -461,7 +485,7 @@ def special (instr):
                     reg[R.PC] = addr
                     if (DEBUG == True):
                         print( "jsr "+str(addr))
-                    reg[R.CLOCK_COUNTER]=reg[R.CLOCK_COUNTER] +5
+                    CLOCK_COUNTER=CLOCK_COUNTER +5
             #JSR
     else: 
                     pass
@@ -477,7 +501,8 @@ def upp(instr):
         reg[R.PSR] = reg[R.PSR] & ~FL.CRY
     if (DEBUG == True):
         print( "upp "+"r"+str(rn))
-    reg[R.CLOCK_COUNTER]=reg[R.CLOCK_COUNTER] +2
+    global CLOCK_COUNTER
+    CLOCK_COUNTER=CLOCK_COUNTER +2
 
 def sta(instr):
     rn = (instr) & 0x7
@@ -488,7 +513,8 @@ def sta(instr):
     reg[R.PC] += 2
     if (DEBUG == True):
         print( "sta " +"r"+str(rn)+" "+str(addr)  )
-    reg[R.CLOCK_COUNTER]=reg[R.CLOCK_COUNTER] +4
+    global CLOCK_COUNTER
+    CLOCK_COUNTER=CLOCK_COUNTER +4
 
 def stx(instr):
     rn = (instr) & 0x6
@@ -505,7 +531,8 @@ def stx(instr):
             print( "stx " +"r"+str(rn) )
         else:
             print( "stx " +"r"+str(rn)+"++"  )
-    reg[R.CLOCK_COUNTER]=reg[R.CLOCK_COUNTER] +3
+    global CLOCK_COUNTER
+    CLOCK_COUNTER=CLOCK_COUNTER +3
 
 def sto(instr):
     rn = (instr) & 0x6
@@ -525,7 +552,8 @@ def sto(instr):
             print( "sto " +"r"+str(rn)+"   "+str(offset)+"  addr:"+str(faddr) )
         else:
             print( "sto " +"r"+str(rn)+"++ "+str(offset)+"  addr:"+str(faddr))
-    reg[R.CLOCK_COUNTER]=reg[R.CLOCK_COUNTER] +4
+    global CLOCK_COUNTER
+    CLOCK_COUNTER=CLOCK_COUNTER +4
 
 def ldi(instr):
     rn = (instr) & 0x7
@@ -535,7 +563,8 @@ def ldi(instr):
     reg[R.PC] += 1
     if (DEBUG == True):
         print( "ldi " +"r"+str(rn)+" "+str(imm)  )
-    reg[R.CLOCK_COUNTER]=reg[R.CLOCK_COUNTER] +2
+    global CLOCK_COUNTER
+    CLOCK_COUNTER=CLOCK_COUNTER +2
 
 def lda(instr):
     rn = (instr) & 0x7
@@ -547,7 +576,8 @@ def lda(instr):
     reg[R.PC] += 2
     if (DEBUG == True):
         print( "lda " +"r"+str(rn)+" "+str(addr)+" "+ str(reg[rn]) )
-    reg[R.CLOCK_COUNTER]=reg[R.CLOCK_COUNTER] +4
+    global CLOCK_COUNTER
+    CLOCK_COUNTER=CLOCK_COUNTER +4
 
 def ldx(instr):
     rn = (instr) & 0x6
@@ -565,7 +595,8 @@ def ldx(instr):
             print( "ldx " +"r"+str(rn) )
         else:
             print( "ldx " +"r"+str(rn)+"++"  )
-    reg[R.CLOCK_COUNTER]=reg[R.CLOCK_COUNTER] +3
+    global CLOCK_COUNTER
+    CLOCK_COUNTER=CLOCK_COUNTER +3
 
 def ldo(instr):
     rn = (instr) & 0x6
@@ -585,7 +616,8 @@ def ldo(instr):
             print( "ldo " +"r"+str(rn)+" "+str(offset)+" addr:"+str(addr+offset) )
         else:
             print( "ldo " +"r"+str(rn)+"++ "+str(offset)+" addr:"+str(addr+offset) )
-    reg[R.CLOCK_COUNTER]=reg[R.CLOCK_COUNTER] +4
+    global CLOCK_COUNTER
+    CLOCK_COUNTER=CLOCK_COUNTER +4
 
 """
 TRAPs implementation
@@ -755,9 +787,14 @@ def mem_read(address):
             #memory[Mr.KBSR] = 0
             memory[Mr.KBDR] = 0
     if address == memory_map.RTC_Address:
-        memory[address] = (reg[R.CLOCK_COUNTER] >> 8) & 0xFF
+        memory[address] = (CLOCK_COUNTER >> 0) & 0xFF
     if address == memory_map.RTC_Address+1:
-        memory[address] = reg[R.CLOCK_COUNTER] & 0xFF
+        memory[address] = (CLOCK_COUNTER >> 8) & 0xFF
+        print(str(CLOCK_COUNTER)+"_\n")
+    """if address == memory_map.RTC_Address+2:
+        memory[address] = (CLOCK_COUNTER >> 16) & 0xFF
+    if address == memory_map.RTC_Address+3:
+        memory[address] = (CLOCK_COUNTER >> 24)  & 0xFF"""
     return memory[address]
 
 
@@ -836,7 +873,7 @@ def print_register():
     print("PC+ "+str(reg[R.PC])+" "+hex(reg[R.PC]))
     print("STK "+str(reg[R.STACK])+" "+hex(reg[R.STACK]))
     print("VEC "+str(reg[R.VECTOR_BASE])+" "+hex(reg[R.VECTOR_BASE]))
-    print("CLOCK "+str(reg[R.CLOCK_COUNTER])+" "+hex(reg[R.CLOCK_COUNTER]))
+    print("CLOCK "+str(CLOCK_COUNTER)+" "+hex(CLOCK_COUNTER))
 
 Program_Start_Addr       = memory_map.ROM_Address 
 ISR_Start_Addr           = 0xFFFF
@@ -861,42 +898,47 @@ def main():
     global ADDR_LIMIT
     global LIMIT
     global STEP
+    global DEBUG
+    global CLOCK_COUNTER
     file_path = sys.argv[1]
     read_image_file(file_path)
     reg[R.PC] = Program_Start_Addr
     reg[R.STACK] = Stack_Start_Addr
-    reg[R.CLOCK_COUNTER]=0
-    dump_memory("initial")
-    while is_running:
-    #for i in range(15):
-        #print(reg)
-        if (reg[R.CLOCK_COUNTER] > 0xffff):
-            reg[R.CLOCK_COUNTER] = 0;
-        if (reg[R.STACK] > 0xfff):
-            is_running = False;
-            print("stack overflow")
-        if (DEBUG == True):
-            print(hex(reg[R.PC]), end="  ")
-        instr = mem_read(reg[R.PC])
-        reg[R.PC] += 1
-        op = instr >> 3
-        fun = ops.get(op, bad_opcode)
-        fun(instr)
-        if (DEBUG == True):
-            print_register()
-        if(STEP):
-            input("Waiting...")
-            dump_memory("final")
-        #dump_memory("final")
-        if (reg[R.PC] == ADDR_LIMIT) & LIMIT:
-            STEP = True
-            LIMIT = False
-            #print_register()
-            input("Waiting...")
-            dump_memory("final")
+    CLOCK_COUNTER= 0
+    #dump_memory("initial")
+    try:
+      while is_running:
+      #for i in range(15):
+          #print(reg)
+          #if (CLOCK_COUNTER > 0xffffffff):
+          #    CLOCK_COUNTER = 0
+          if (reg[R.STACK] > 0xfff):
+              is_running = False;
+              print("stack overflow")
+          if (DEBUG == True):
+              print(hex(reg[R.PC]), end="  ")
+          instr = mem_read(reg[R.PC])
+          reg[R.PC] += 1
+          op = instr >> 3
+          fun = ops.get(op, bad_opcode)
+          fun(instr)
+          if (DEBUG == True):
+              print_register()
+          if(STEP):
+              input("Waiting...")
+              #dump_memory("final")
+          #dump_memory("final")
+          if (reg[R.PC] == ADDR_LIMIT) & LIMIT:
+              STEP = True
+              LIMIT = False
+              #print_register()
+              input("Waiting...")
+              #dump_memory("final")
+    except KeyboardInterrupt:
+      exit();
            
        
-    dump_memory("final")
+    #dump_memory("final")
     #dump_regfile()
     #print_register() 
 
