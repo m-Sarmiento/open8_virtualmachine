@@ -329,7 +329,7 @@ def br0(instr):
     bit = (instr) & 0x7
     pc_offset = sign_extend((mem_read(reg[R.PC])) & 0xff, 8)
     if ((reg[R.PSR]>>bit) & 0x1) == 0:
-        reg[R.PC] += (pc_offset-2)+1
+        reg[R.PC] += (pc_offset)+1
     else:
         reg[R.PC] +=1
     if (DEBUG == True):
@@ -340,7 +340,7 @@ def br1(instr):
     bit = (instr) & 0x7
     pc_offset = sign_extend((mem_read(reg[R.PC])) & 0xff, 8)
     if ((reg[R.PSR]>>bit) & 0x1) == 1:
-        reg[R.PC] += (pc_offset-2)+1
+        reg[R.PC] += (pc_offset)+1
     else:
         reg[R.PC] +=1
     if (DEBUG == True):
