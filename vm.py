@@ -791,6 +791,8 @@ def mem_read(address):
     if address == memory_map.RTC_Address+1:
         memory[address] = (CLOCK_COUNTER >> 8) & 0xFF
         print(str(CLOCK_COUNTER)+"_\n")
+    if (address == memory_map.SER_Address+1 ):
+        memory[address] = 0x50 # 0101, 0000, => TXFIFO and RXFIFO empty
     """if address == memory_map.RTC_Address+2:
         memory[address] = (CLOCK_COUNTER >> 16) & 0xFF
     if address == memory_map.RTC_Address+3:
